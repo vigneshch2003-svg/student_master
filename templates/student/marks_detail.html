@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Marks — {{ student.name }}{% endblock %}
+
+{% block content %}
+
+<div class="mdn-page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 style="font-size:1.5rem"><i class="bi bi-bar-chart me-2" style="color:var(--mdn-blue)"></i>{{ student.name }}</h1>
+        <p>
+            <span class="me-3"><i class="bi bi-hash me-1"></i>{{ student.roll_number }}</span>
+            <span class="me-3"><i class="bi bi-book me-1"></i>{{ student.course }}</span>
+            <span><i class="bi bi-calendar me-1"></i>Year {{ student.year }}</span>
+        </p>
+    </div>
+    {% if is_admin or is_staff %}
+    <a href="{% url 'marks_create' student.id %}" class="btn btn-mdn">
+        <i class="bi bi-plus me-1"></i> Add Marks
+    </a>
+    {% endif %}
+</div>
+
+<div class="mdn-card">
+    <div class="mdn-card-header">Subject-wise Performance</div>
+    <div class="table-responsive">
+        <table class="mdn-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th class="text-center">Marks Obtained</th>
+                    <th class="text-center">Total Marks</th>
+                    <th class="text-center">Percentage</th>
+                    <th class="text-center">Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mark in marks %}
+                <tr>
+                    <td class="fw-semibold">{{ mark.subject }}</td>
+                    <td class="text-center">{{ mark.marks_obtained }}</td>
+                    <td class="text-center">{{ mark.total_marks }}</td>
+                    <td class="text-center">{{ mark.percentage|floatformat:1 }}%</td>
+                    <td class="text-center">
+                        {% if mark.grade == 'A' %}<span class="badge bg-success px-3">A</span>
+                        {% elif mark.grade == 'B' %}<span class="badge bg-primary px-3">B</span>
+                        {% elif mark.grade == 'C' %}<span class="badge bg-info text-dark px-3">C</span>
+                        {% elif mark.grade == 'D' %}<span class="badge bg-warning text-dark px-3">D</span>
+                        {% else %}<span class="badge bg-danger px-3">F</span>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5" style="color:var(--mdn-muted)">
+                        <i class="bi bi-journal-x fs-2 d-block mb-2"></i>No marks recorded yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Back to Students
+    </a>
+</div>
+
+{% endblock %}

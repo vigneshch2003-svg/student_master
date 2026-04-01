@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+
+{% block content %}
+
+<div class="mdn-page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1><i class="bi bi-people me-2" style="color:var(--mdn-blue)"></i>Students</h1>
+    </div>
+    {% if is_admin or is_staff %}
+    <a href="{% url 'student_create' %}" class="btn btn-mdn">
+        <i class="bi bi-plus me-1"></i> Add Student
+    </a>
+    {% endif %}
+</div>
+
+{% if is_admin or is_staff %}
+<div class="mb-4">
+    <form method="get">
+        <div class="input-group" style="max-width:420px">
+            <input type="text" name="q" class="form-control" placeholder="Search by name or course…" value="{{ q }}">
+            <button class="btn btn-mdn" type="submit"><i class="bi bi-search"></i></button>
+            {% if q %}
+            <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<div class="mdn-card">
+    <div class="mdn-card-header d-flex justify-content-between">
+        <span>All Students</span>
+        <span>{{ students.paginator.count }} record{{ students.paginator.count|pluralize }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="mdn-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Roll No.</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Gender</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if student.profile_image %}
+                                <img src="{{ student.profile_image.url }}" width="36" height="36" class="rounded-circle object-fit-cover">
+                            {% else %}
+                                <div class="avatar-circle">{{ student.name|first|upper }}</div>
+                            {% endif %}
+                            <span class="fw-semibold">{{ student.name }}</span>
+                        </div>
+                    </td>
+                    <td><span class="mdn-badge">{{ student.roll_number }}</span></td>
+                    <td style="color:var(--mdn-muted)">{{ student.email }}</td>
+                    <td>{{ student.phone }}</td>
+                    <td>{{ student.course }}</td>
+                    <td>{{ student.year }}</td>
+                    <td>{{ student.gender }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'marks_detail' student.id %}" class="btn btn-sm btn-mdn-outline">Marks</a>
+                            {% if is_admin or is_staff %}
+                            <a href="{% url 'student_update' student.id %}" class="btn btn-sm btn-outline-warning">Edit</a>
+                            {% endif %}
+                            {% if is_admin %}
+                            <a href="{% url 'student_delete' student.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-5" style="color:var(--mdn-muted)">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>No students found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if students.paginator.num_pages > 1 %}
+    <div class="d-flex justify-content-between align-items-center px-3 py-2" style="border-top:1px solid var(--mdn-border)">
+        <small style="color:var(--mdn-muted)">Page {{ students.number }} of {{ students.paginator.num_pages }}</small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if students.has_previous %}
+                <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ students.previous_page_number }}">Previous</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+                {% for num in students.paginator.page_range %}
+                <li class="page-item {% if num == students.number %}active{% endif %}">
+                    <a class="page-link" href="?q={{ q }}&page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                {% if students.has_next %}
+                <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ students.next_page_number }}">Next</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

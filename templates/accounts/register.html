@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Create Staff Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div class="mdn-page-header text-center" style="border:none;padding-bottom:0.5rem">
+            <h1 style="font-size:1.5rem">Create Staff Account</h1>
+            <p>Register as Admin or Staff</p>
+        </div>
+        <div class="mdn-card">
+            <div class="p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger mt-1" style="font-size:0.82rem">{% for e in field.errors %}{{ e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-mdn w-100 mt-1">Create account</button>
+                </form>
+                <hr style="border-color:var(--mdn-border)">
+                <p class="text-center mb-0" style="font-size:0.85rem;color:var(--mdn-muted)">
+                    Already have an account? <a href="{% url 'staff_login' %}" style="color:var(--mdn-blue);font-weight:600">Staff Login &rarr;</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

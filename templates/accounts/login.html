@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Student Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-4">
+        <div class="mdn-page-header text-center" style="border:none;padding-bottom:0.5rem">
+            <h1 style="font-size:1.5rem">Student Login</h1>
+            <p>Sign in with your roll number and date of birth</p>
+        </div>
+        <div class="mdn-card">
+            <div class="p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Date of Birth <small style="color:var(--mdn-muted);font-weight:400">(YYYY-MM-DD)</small></label>
+                        <input type="text" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-mdn w-100">Log in as Student</button>
+                </form>
+                <hr style="border-color:var(--mdn-border)">
+                <p class="text-center mb-0" style="font-size:0.85rem;color:var(--mdn-muted)">
+                    Admin or Staff? <a href="{% url 'staff_login' %}" style="color:var(--mdn-blue);font-weight:600">Staff Login &rarr;</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

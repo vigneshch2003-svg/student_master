@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Delete Student{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div class="mdn-card">
+            <div class="mdn-card-header" style="color:#c0392b">
+                <i class="bi bi-exclamation-triangle me-2"></i>Delete Student
+            </div>
+            <div class="p-4 text-center">
+                <p class="mb-1" style="color:var(--mdn-muted)">You are about to permanently delete:</p>
+                <p class="fw-bold fs-5 mb-1">{{ student.name }}</p>
+                <p style="color:var(--mdn-muted);font-size:0.85rem" class="mb-4">
+                    Roll No: {{ student.roll_number }} &bull; {{ student.course }}
+                </p>
+                <div class="alert alert-danger text-start" style="font-size:0.85rem">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    This will also delete all marks records for this student and <strong>cannot be undone</strong>.
+                </div>
+                <form method="POST" class="d-flex justify-content-center gap-3 mt-3">
+                    {% csrf_token %}
+                    <a href="{% url 'student_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
