@@ -15,7 +15,7 @@ class CourseForm(forms.ModelForm):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        exclude = ['user']
+        fields = ['name','roll_number','email','phone','course','date_of_birth','profile_image','address','gender','year']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'roll_number': forms.TextInput(attrs={'class': 'form-control'}),
@@ -23,6 +23,7 @@ class StudentForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'course': forms.Select(attrs={'class': 'form-select'}),
             'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'gender': forms.Select(attrs={'class': 'form-select'}),
             'year': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -40,7 +41,7 @@ class MarksForm(forms.ModelForm):
             'total_marks': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-    def clean(self):
+    def clean(self):                         #clean is used for self validation of form data.
         cleaned_data = super().clean()
         total_marks = cleaned_data.get('total_marks')
         marks_obtained = cleaned_data.get('marks_obtained')

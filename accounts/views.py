@@ -6,7 +6,6 @@ from .forms import StaffRegisterForm
 
 
 def student_login_view(request):
-    """Students log in with roll number (username) + date of birth (password)."""
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
@@ -20,7 +19,6 @@ def student_login_view(request):
 
 
 def staff_login_view(request):
-    """Admin / Staff log in with username + password."""
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
@@ -34,7 +32,6 @@ def staff_login_view(request):
 
 
 def staff_register_view(request):
-    """Registration — Staff / Admin only."""
     if request.method == 'POST':
         form = StaffRegisterForm(request.POST)
         if form.is_valid():

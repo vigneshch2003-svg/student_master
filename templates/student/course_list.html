@@ -1,48 +1,76 @@
 {% extends 'base.html' %}
 {% block title %}Courses{% endblock %}
-
+ 
 {% block content %}
-
-<div class="mdn-page-header d-flex justify-content-between align-items-start">
+ 
+<!-- Page header -->
+<div class="mdn-page-header">
     <div>
-        <h1><i class="bi bi-book me-2" style="color:var(--mdn-blue)"></i>Courses</h1>
-        <p>Manage available courses</p>
+        <h1><i class="bi bi-book me-2" style="color:var(--blue);font-size:1.5rem;"></i>Courses</h1>
+        <p>Manage available courses in the system</p>
     </div>
-    <a href="{% url 'course_create' %}" class="btn btn-mdn">
-        <i class="bi bi-plus me-1"></i> Add Course
+    <a href="{% url 'course_create' %}" class="btn-mdn" style="white-space:nowrap;">
+        <i class="bi bi-plus-lg"></i> Add Course
     </a>
 </div>
-
+ 
+<!-- Table card -->
 <div class="mdn-card">
-    <div class="mdn-card-header d-flex justify-content-between">
-        <span>All Courses</span>
-        <span>{{ courses.count }} course{{ courses.count|pluralize }}</span>
+    <div class="mdn-card-header" style="justify-content:space-between;">
+        <span><i class="bi bi-journal-bookmark me-1"></i>All Courses</span>
+        <span class="mdn-badge">{{ courses.count }} course{{ courses.count|pluralize }}</span>
     </div>
+ 
     <div class="table-responsive">
         <table class="mdn-table">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Course Name</th>
                     <th>Description</th>
-                    <th>Actions</th>
+                    <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for course in courses %}
                 <tr>
-                    <td class="fw-semibold">{{ course.name }}</td>
-                    <td style="color:var(--mdn-muted)">{{ course.description|default:"—" }}</td>
+                    <td style="color:var(--muted);font-size:0.8rem;font-weight:600;width:40px;">
+                        {{ forloop.counter }}
+                    </td>
                     <td>
-                        <div class="d-flex gap-1">
-                            <a href="{% url 'course_update' course.id %}" class="btn btn-sm btn-outline-warning">Edit</a>
-                            <a href="{% url 'course_delete' course.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:34px;height:34px;border-radius:9px;background:#f5f3ff;border:1px solid #e9d5ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-book-fill" style="color:#7c3aed;font-size:0.9rem;"></i>
+                            </div>
+                            <span style="font-weight:600;">{{ course.name }}</span>
+                        </div>
+                    </td>
+                    <td style="color:var(--muted);font-size:0.875rem;">
+                        {{ course.description|default:"<span style='color:#94a3b8;font-style:italic;'>No description</span>" }}
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
+                            <a href="{% url 'course_update' course.id %}" class="tbl-btn tbl-btn-amber" title="Edit Course">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{% url 'course_delete' course.id %}" class="tbl-btn tbl-btn-red" title="Delete Course">
+                                <i class="bi bi-trash3"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" class="text-center py-5" style="color:var(--mdn-muted)">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>No courses yet.
+                    <td colspan="4">
+                        <div style="text-align:center;padding:3.5rem 1rem;color:var(--muted);">
+                            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                                <i class="bi bi-book" style="font-size:1.4rem;color:var(--muted);"></i>
+                            </div>
+                            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">No courses yet</div>
+                            <div style="font-size:0.84rem;">
+                                <a href="{% url 'course_create' %}" style="color:var(--blue);">Add your first course</a> to get started.
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -50,5 +78,18 @@
         </table>
     </div>
 </div>
-
+ 
+<style>
+.tbl-btn {
+    display:inline-flex;align-items:center;gap:5px;
+    padding:5px 10px;border-radius:6px;font-size:0.78rem;font-weight:600;
+    text-decoration:none;border:1px solid transparent;
+    transition:all 0.15s;white-space:nowrap;
+}
+.tbl-btn-amber { background:#fffbeb;color:#b45309;border-color:#fde68a; }
+.tbl-btn-amber:hover { background:#f59e0b;color:#fff; }
+.tbl-btn-red   { background:#fef2f2;color:#b91c1c;border-color:#fecaca; }
+.tbl-btn-red:hover   { background:#ef4444;color:#fff; }
+</style>
+ 
 {% endblock %}

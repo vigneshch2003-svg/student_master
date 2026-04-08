@@ -1,38 +1,55 @@
 {% extends 'base.html' %}
 {% block title %}Students{% endblock %}
-
+ 
 {% block content %}
-
-<div class="mdn-page-header d-flex justify-content-between align-items-start">
+ 
+<!-- ─── Page Header ─────────────────────────────────────────────────── -->
+<div class="mdn-page-header">
     <div>
-        <h1><i class="bi bi-people me-2" style="color:var(--mdn-blue)"></i>Students</h1>
+        <h1><i class="bi bi-people me-2" style="color:var(--blue);font-size:1.5rem;"></i>Students</h1>
+        <p>All enrolled students in the system</p>
     </div>
     {% if is_admin or is_staff %}
-    <a href="{% url 'student_create' %}" class="btn btn-mdn">
-        <i class="bi bi-plus me-1"></i> Add Student
+    <a href="{% url 'student_create' %}" class="btn-mdn" style="white-space:nowrap;">
+        <i class="bi bi-plus-lg"></i> Add Student
     </a>
     {% endif %}
 </div>
-
+ 
+<!-- ─── Search bar ──────────────────────────────────────────────────── -->
 {% if is_admin or is_staff %}
-<div class="mb-4">
+<div style="margin-bottom:1.25rem;">
     <form method="get">
-        <div class="input-group" style="max-width:420px">
-            <input type="text" name="q" class="form-control" placeholder="Search by name or course…" value="{{ q }}">
-            <button class="btn btn-mdn" type="submit"><i class="bi bi-search"></i></button>
+        <div style="display:flex;gap:8px;max-width:460px;">
+            <div style="position:relative;flex:1;">
+                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none;"></i>
+                <input type="text" name="q" class="form-control"
+                       style="padding-left:2.2rem;"
+                       placeholder="Search by name or course…"
+                       value="{{ q }}">
+            </div>
+            <button class="btn-mdn" type="submit" style="padding:0.45rem 1.1rem;">Search</button>
             {% if q %}
-            <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">Clear</a>
+            <a href="{% url 'student_list' %}" class="btn-mdn-outline" style="color:var(--muted);border-color:var(--border);padding:0.45rem 0.9rem;">
+                <i class="bi bi-x"></i> Clear
+            </a>
             {% endif %}
         </div>
     </form>
 </div>
 {% endif %}
-
+ 
+<!-- ─── Table card ──────────────────────────────────────────────────── -->
 <div class="mdn-card">
-    <div class="mdn-card-header d-flex justify-content-between">
-        <span>All Students</span>
-        <span>{{ students.paginator.count }} record{{ students.paginator.count|pluralize }}</span>
+ 
+    <!-- Card header with count -->
+    <div class="mdn-card-header" style="justify-content:space-between;">
+        <span><i class="bi bi-table me-1"></i>All Students</span>
+        <span class="mdn-badge">
+            {{ students.paginator.count }} record{{ students.paginator.count|pluralize }}
+        </span>
     </div>
+ 
     <div class="table-responsive">
         <table class="mdn-table">
             <thead>
@@ -44,75 +61,153 @@
                     <th>Course</th>
                     <th>Year</th>
                     <th>Gender</th>
-                    <th>Actions</th>
+                    <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student in students %}
                 <tr>
+                    <!-- Name + avatar -->
                     <td>
-                        <div class="d-flex align-items-center gap-2">
+                        <div style="display:flex;align-items:center;gap:10px;">
                             {% if student.profile_image %}
-                                <img src="{{ student.profile_image.url }}" width="36" height="36" class="rounded-circle object-fit-cover">
+                                <img src="{{ student.profile_image.url }}"
+                                     style="width:36px;height:36px;border-radius:9px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;">
                             {% else %}
                                 <div class="avatar-circle">{{ student.name|first|upper }}</div>
                             {% endif %}
-                            <span class="fw-semibold">{{ student.name }}</span>
+                            <span style="font-weight:600;">{{ student.name }}</span>
                         </div>
                     </td>
+ 
                     <td><span class="mdn-badge">{{ student.roll_number }}</span></td>
-                    <td style="color:var(--mdn-muted)">{{ student.email }}</td>
-                    <td>{{ student.phone }}</td>
-                    <td>{{ student.course }}</td>
-                    <td>{{ student.year }}</td>
-                    <td>{{ student.gender }}</td>
+ 
+                    <td style="color:var(--muted);font-size:0.875rem;">{{ student.email }}</td>
+ 
+                    <td style="font-size:0.875rem;">{{ student.phone }}</td>
+ 
                     <td>
-                        <div class="d-flex gap-1">
-                            <a href="{% url 'marks_detail' student.id %}" class="btn btn-sm btn-mdn-outline">Marks</a>
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.875rem;">
+                            <i class="bi bi-book" style="color:var(--muted);font-size:0.8rem;"></i>
+                            {{ student.course }}
+                        </span>
+                    </td>
+ 
+                    <td>
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--blue-lt);color:var(--blue);border-radius:6px;font-size:0.78rem;font-weight:700;">
+                            {{ student.year }}
+                        </span>
+                    </td>
+ 
+                    <td style="font-size:0.875rem;color:var(--muted);">{{ student.gender }}</td>
+ 
+                    <!-- Actions -->
+                    <td>
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
+                            <a href="{% url 'marks_detail' student.id %}"
+                               class="tbl-btn tbl-btn-blue" title="View Marks">
+                                <i class="bi bi-bar-chart-line"></i> Marks
+                            </a>
                             {% if is_admin or is_staff %}
-                            <a href="{% url 'student_update' student.id %}" class="btn btn-sm btn-outline-warning">Edit</a>
+                            <a href="{% url 'student_update' student.id %}"
+                               class="tbl-btn tbl-btn-amber" title="Edit Student">
+                                <i class="bi bi-pencil"></i>
+                            </a>
                             {% endif %}
                             {% if is_admin %}
-                            <a href="{% url 'student_delete' student.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <a href="{% url 'student_delete' student.id %}"
+                               class="tbl-btn tbl-btn-red" title="Delete Student">
+                                <i class="bi bi-trash3"></i>
+                            </a>
                             {% endif %}
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-center py-5" style="color:var(--mdn-muted)">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>No students found.
+                    <td colspan="8">
+                        <div style="text-align:center;padding:3.5rem 1rem;color:var(--muted);">
+                            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                                <i class="bi bi-inbox" style="font-size:1.4rem;color:var(--muted);"></i>
+                            </div>
+                            <div style="font-weight:600;color:var(--text);margin-bottom:4px;">No students found</div>
+                            <div style="font-size:0.84rem;">
+                                {% if q %}Try a different search term or <a href="{% url 'student_list' %}" style="color:var(--blue);">clear the filter</a>.
+                                {% else %}Get started by adding your first student.{% endif %}
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
+ 
+    <!-- ─── Pagination ─────────────────────────────────────────────── -->
     {% if students.paginator.num_pages > 1 %}
-    <div class="d-flex justify-content-between align-items-center px-3 py-2" style="border-top:1px solid var(--mdn-border)">
-        <small style="color:var(--mdn-muted)">Page {{ students.number }} of {{ students.paginator.num_pages }}</small>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 1.25rem;border-top:1px solid var(--border);">
+        <small style="color:var(--muted);">
+            Page <strong>{{ students.number }}</strong> of <strong>{{ students.paginator.num_pages }}</strong>
+        </small>
         <nav>
-            <ul class="pagination pagination-sm mb-0">
+            <ul class="pagination pagination-sm mb-0" style="gap:2px;">
                 {% if students.has_previous %}
-                <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ students.previous_page_number }}">Previous</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ q }}&page={{ students.previous_page_number }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
                 {% else %}
-                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                </li>
                 {% endif %}
+ 
                 {% for num in students.paginator.page_range %}
                 <li class="page-item {% if num == students.number %}active{% endif %}">
                     <a class="page-link" href="?q={{ q }}&page={{ num }}">{{ num }}</a>
                 </li>
                 {% endfor %}
+ 
                 {% if students.has_next %}
-                <li class="page-item"><a class="page-link" href="?q={{ q }}&page={{ students.next_page_number }}">Next</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ q }}&page={{ students.next_page_number }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
                 {% else %}
-                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                </li>
                 {% endif %}
             </ul>
         </nav>
     </div>
     {% endif %}
+ 
 </div>
-
+ 
+<!-- ─── Scoped styles ───────────────────────────────────────────────── -->
+<style>
+    .tbl-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+    .tbl-btn-blue  { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+    .tbl-btn-blue:hover  { background:#2563eb; color:#fff; }
+    .tbl-btn-amber { background:#fffbeb; color:#b45309; border-color:#fde68a; }
+    .tbl-btn-amber:hover { background:#f59e0b; color:#fff; }
+    .tbl-btn-red   { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+    .tbl-btn-red:hover   { background:#ef4444; color:#fff; }
+</style>
+ 
 {% endblock %}

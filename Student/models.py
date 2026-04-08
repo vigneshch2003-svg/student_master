@@ -14,7 +14,7 @@ class Course(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_profile')
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_profile') #only one user is assinged to one student .
     name = models.CharField(max_length=100)
     roll_number = models.CharField(max_length=20, unique=True)
     email = models.EmailField(max_length=100, unique=True)
@@ -31,12 +31,12 @@ class Student(models.Model):
 
 
 class Marks(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE) #one suject marks can be assinged to many student.
     subject = models.CharField(max_length=100)
     marks_obtained = models.IntegerField()
     total_marks = models.IntegerField(default=100)
 
-    @property
+    @property                           #property is used to calculate values without storing them in the database. It allows us to define a method that can be accessed like an attribute.
     def percentage(self):
         return (self.marks_obtained / self.total_marks) * 100
 

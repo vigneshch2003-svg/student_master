@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class StaffRegisterForm(forms.ModelForm):
-    """Registration form — Staff role only."""
+   
     ROLE_CHOICES = [
         ('Staff', 'Staff'),
         ('Admin', 'Admin'),

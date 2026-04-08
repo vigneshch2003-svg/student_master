@@ -1,29 +1,47 @@
 {% extends 'base.html' %}
 {% block title %}Delete Student{% endblock %}
-
+ 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-5">
-        <div class="mdn-card">
-            <div class="mdn-card-header" style="color:#c0392b">
-                <i class="bi bi-exclamation-triangle me-2"></i>Delete Student
+<div class="row justify-content-center" style="margin-top:2rem;">
+    <div class="col-md-5 col-lg-4">
+        <div class="mdn-card" style="border-color:#fecaca;">
+ 
+            <!-- Header -->
+            <div class="mdn-card-header" style="background:#fef2f2;border-color:#fecaca;color:#b91c1c;">
+                <i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i>
+                Delete Student
             </div>
-            <div class="p-4 text-center">
-                <p class="mb-1" style="color:var(--mdn-muted)">You are about to permanently delete:</p>
-                <p class="fw-bold fs-5 mb-1">{{ student.name }}</p>
-                <p style="color:var(--mdn-muted);font-size:0.85rem" class="mb-4">
-                    Roll No: {{ student.roll_number }} &bull; {{ student.course }}
-                </p>
-                <div class="alert alert-danger text-start" style="font-size:0.85rem">
-                    <i class="bi bi-exclamation-circle me-1"></i>
-                    This will also delete all marks records for this student and <strong>cannot be undone</strong>.
+ 
+            <div style="padding:2rem 1.75rem;text-align:center;">
+ 
+                <!-- Danger icon -->
+                <div style="width:60px;height:60px;border-radius:16px;background:#fef2f2;border:1px solid #fecaca;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+                    <i class="bi bi-person-x-fill" style="font-size:1.6rem;color:#ef4444;"></i>
                 </div>
-                <form method="POST" class="d-flex justify-content-center gap-3 mt-3">
+ 
+                <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.4rem;">You are about to permanently delete:</p>
+                <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:0.3rem;">{{ student.name }}</div>
+                <div style="display:inline-flex;gap:8px;justify-content:center;margin-bottom:1.5rem;">
+                    <span class="mdn-badge">{{ student.roll_number }}</span>
+                    <span style="color:var(--muted);font-size:0.84rem;align-self:center;">{{ student.course }}</span>
+                </div>
+ 
+                <!-- Warning box -->
+                <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:0.85rem 1rem;text-align:left;margin-bottom:1.5rem;font-size:0.84rem;color:#7f1d1d;">
+                    <i class="bi bi-exclamation-circle-fill me-1" style="color:#ef4444;"></i>
+                    All marks records for this student will also be deleted. This action <strong>cannot be undone</strong>.
+                </div>
+ 
+                <form method="POST">
                     {% csrf_token %}
-                    <a href="{% url 'student_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
-                    <button type="submit" class="btn btn-danger px-4">
-                        <i class="bi bi-trash me-1"></i> Delete
-                    </button>
+                    <div style="display:flex;gap:10px;justify-content:center;">
+                        <a href="{% url 'student_list' %}" class="btn-mdn-outline" style="padding:0.45rem 1.5rem;color:var(--muted);border-color:var(--border);">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-mdn" style="background:#ef4444;padding:0.45rem 1.5rem;">
+                            <i class="bi bi-trash3"></i> Delete
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

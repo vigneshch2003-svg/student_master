@@ -10,19 +10,18 @@ from .forms import StudentForm, MarksForm, CourseForm
 
 
 def _sync_student_user(student):
-    """Create or update the Django User linked to this student.
-    username = roll_number, password = date_of_birth as YYYY-MM-DD."""
+    
     dob_str = student.date_of_birth.strftime('%Y-%m-%d')
     student_group, _ = Group.objects.get_or_create(name='Student')
 
     if student.user:
-        # Update existing user credentials if roll_number or DOB changed
+    
         user = student.user
         user.username = student.roll_number
         user.set_password(dob_str)
         user.save()
     else:
-        # Create a new user
+    
         user, created = User.objects.get_or_create(username=student.roll_number)
         user.set_password(dob_str)
         user.save()
@@ -37,7 +36,7 @@ def dashboard(request):
     is_staff = request.user.groups.filter(name='Staff').exists()
     is_student = request.user.groups.filter(name='Student').exists()
 
-    # For student users, fetch their own profile
+    
     student_profile = None
     if is_student and not is_admin and not is_staff:
         try:
@@ -58,16 +57,15 @@ def student_list(request):
     is_admin = request.user.groups.filter(name='Admin').exists()
     is_staff = request.user.groups.filter(name='Staff').exists()
     is_student = request.user.groups.filter(name='Student').exists()
-
-    # Student users see only their own record
+    
     if is_student and not is_admin and not is_staff:
         try:
             own = Student.objects.get(user=request.user)
             students_qs = Student.objects.filter(pk=own.pk)
         except Student.DoesNotExist:
             students_qs = Student.objects.none()
-        q = ''
-        paginator = Paginator(students_qs, 10)
+        q = ''                                          #q is used for search function.
+        paginator = Paginator(students_qs, 6)
         students = paginator.get_page(1)
         return render(request, 'student/student_list.html', {
             'students': students,
@@ -76,10 +74,10 @@ def student_list(request):
             'is_staff': is_staff,
         })
 
-    q = request.GET.get('q', '')
+    q = request.GET.get('q', '')      
     if q:
         students_qs = Student.objects.filter(
-            models.Q(name__icontains=q) | models.Q(course__name__icontains=q)
+            models.Q(name__icontains=q) | models.Q(course__name__icontains=q) #modelQ is used for multiple field search.
         )
     else:
         students_qs = Student.objects.all()
@@ -100,7 +98,7 @@ def student_create(request):
             request.user.groups.filter(name='Staff').exists()):
         raise PermissionDenied
     if request.method == 'POST':
-        form = StudentForm(request.POST, request.FILES)
+        form = StudentForm(request.POST, request.FILES)  #request.files is used for profile image.
         if form.is_valid():
             student = form.save()
             _sync_student_user(student)
@@ -114,7 +112,7 @@ def student_create(request):
 
 
 @login_required
-def student_update(request, pk):
+def student_update(request, pk):                                             #/student/update/1
     if not (request.user.groups.filter(name='Admin').exists() or
             request.user.groups.filter(name='Staff').exists()):
         raise PermissionDenied
@@ -156,7 +154,7 @@ def marks_create(request, student_pk):
             messages.success(request, 'Marks added successfully!')
             return redirect('marks_detail', pk=student_pk)
     else:
-        form = MarksForm(initial={'student': student})
+        form = MarksForm(initial={'student': student})                                    #initial is used to automatically fill the student field.
     return render(request, 'student/marks_form.html', {'form': form, 'student': student})
 
 
@@ -167,7 +165,7 @@ def marks_detail(request, pk):
     is_staff = request.user.groups.filter(name='Staff').exists()
     is_student = request.user.groups.filter(name='Student').exists()
 
-    # Student users can only view their own marks
+   
     if is_student and not is_admin and not is_staff:
         if student.user != request.user:
             raise PermissionDenied

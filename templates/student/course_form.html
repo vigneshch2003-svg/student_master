@@ -1,38 +1,64 @@
 {% extends 'base.html' %}
 {% block title %}{% if course %}Edit Course{% else %}Add Course{% endif %}{% endblock %}
-
+ 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-5">
+    <div class="col-lg-5 col-md-7">
+ 
+        <!-- Page header -->
         <div class="mdn-page-header">
-            <h1 style="font-size:1.5rem">{% if course %}Edit Course{% else %}Add Course{% endif %}</h1>
-            <p>{% if course %}Update course details{% else %}Create a new course{% endif %}</p>
+            <div>
+                <h1>{% if course %}Edit Course{% else %}Add Course{% endif %}</h1>
+                <p>{% if course %}Update the course details below{% else %}Create a new course for students to enroll in{% endif %}</p>
+            </div>
+            <a href="{% url 'course_list' %}" class="btn-mdn-outline" style="white-space:nowrap;color:var(--muted);border-color:var(--border);">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
         </div>
+ 
+        <!-- Form card -->
         <div class="mdn-card">
-            <div class="mdn-card-header">Course Details</div>
-            <div class="p-4">
+            <div class="mdn-card-header">
+                <i class="bi bi-journal-plus" style="color:var(--blue)"></i>
+                Course Details
+            </div>
+            <div style="padding:1.5rem;">
                 <form method="POST">
                     {% csrf_token %}
                     {% for field in form %}
-                    <div class="mb-3">
+                    <div style="margin-bottom:1rem;">
                         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                         {{ field }}
                         {% if field.errors %}
-                        <div class="text-danger mt-1" style="font-size:0.82rem">{% for e in field.errors %}{{ e }}{% endfor %}</div>
+                        <div class="field-error">{% for e in field.errors %}{{ e }}{% endfor %}</div>
                         {% endif %}
                     </div>
                     {% endfor %}
-                    <div class="d-flex justify-content-between mt-4 pt-3" style="border-top:1px solid var(--mdn-border)">
-                        <a href="{% url 'course_list' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-1"></i> Cancel
+ 
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+                        <a href="{% url 'course_list' %}" class="btn-mdn-outline" style="color:var(--muted);border-color:var(--border);">
+                            <i class="bi bi-x"></i> Cancel
                         </a>
-                        <button type="submit" class="btn btn-mdn px-4">
-                            {% if course %}Update{% else %}Save{% endif %}
+                        <button type="submit" class="btn-mdn" style="padding:0.45rem 1.75rem;">
+                            <i class="bi bi-{% if course %}check-lg{% else %}plus-lg{% endif %}"></i>
+                            {% if course %}Update Course{% else %}Save Course{% endif %}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+ 
     </div>
 </div>
+ 
+<style>
+.field-error {
+    margin-top:5px;font-size:0.8rem;color:#b91c1c;
+    display:flex;align-items:flex-start;gap:4px;
+}
+.field-error::before {
+    content:'\F623';font-family:'bootstrap-icons';flex-shrink:0;margin-top:1px;
+}
+</style>
+ 
 {% endblock %}

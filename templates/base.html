@@ -6,116 +6,558 @@
     <title>{% block title %}StudentMaster{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ─── Design Tokens ─────────────────────────────────────── */
         :root {
-            --mdn-blue:    #0069c2;
-            --mdn-blue-dk: #003d82;
-            --mdn-navy:    #1b1b1b;
-            --mdn-bg:      #ffffff;
-            --mdn-surface: #f9f9fb;
-            --mdn-border:  #d7d7db;
-            --mdn-text:    #15141a;
-            --mdn-muted:   #5b5b66;
+            --blue:       #2563eb;
+            --blue-lt:    #eff6ff;
+            --blue-dk:    #1d4ed8;
+            --navy:       #0f172a;
+            --navy-mid:   #1e293b;
+            --navy-border:#334155;
+            --bg:         #f8fafc;
+            --surface:    #ffffff;
+            --border:     #e2e8f0;
+            --text:       #0f172a;
+            --muted:      #64748b;
+            --accent:     #38bdf8;
+            --danger:     #ef4444;
+            --success:    #22c55e;
         }
-        * { box-sizing: border-box; }
+ 
+        /* ─── Reset / Base ──────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
         body {
-            background: var(--mdn-bg);
-            color: var(--mdn-text);
-            font-family: Inter, system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', system-ui, sans-serif;
             font-size: 0.95rem;
-            line-height: 1.6;
+            line-height: 1.65;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        /* Navbar */
-        .mdn-nav { background: var(--mdn-navy) !important; border-bottom: 1px solid #333; padding: 0.55rem 0; }
-        .mdn-nav .navbar-brand { color: #fff !important; font-weight: 700; font-size: 1.15rem; }
-        .mdn-nav .navbar-brand span { color: #81b0ff; }
-        .mdn-nav .nav-link { color: #ccc !important; font-size: 0.88rem; padding: 0.3rem 0.75rem !important; border-radius: 4px; }
-        .mdn-nav .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff !important; }
-        .mdn-nav .nav-user { color: #aaa; font-size: 0.82rem; }
-        /* Buttons */
-        .btn-mdn { background: var(--mdn-blue); color: #fff; border: none; border-radius: 4px; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.9rem; }
-        .btn-mdn:hover { background: var(--mdn-blue-dk); color: #fff; }
-        .btn-mdn-outline { border: 1.5px solid var(--mdn-blue); color: var(--mdn-blue); background: transparent; border-radius: 4px; font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.9rem; }
-        .btn-mdn-outline:hover { background: var(--mdn-blue); color: #fff; }
-        /* Page header */
-        .mdn-page-header { border-bottom: 1px solid var(--mdn-border); padding-bottom: 1rem; margin-bottom: 1.75rem; }
-        .mdn-page-header h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.2rem; }
-        .mdn-page-header p { color: var(--mdn-muted); margin: 0; font-size: 0.88rem; }
-        /* Cards */
-        .mdn-card { background: var(--mdn-bg); border: 1px solid var(--mdn-border); border-radius: 6px; overflow: hidden; }
-        .mdn-card-header { background: var(--mdn-surface); border-bottom: 1px solid var(--mdn-border); padding: 0.7rem 1.25rem; font-weight: 600; font-size: 0.88rem; color: var(--mdn-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        /* Stat box */
-        .stat-box { border: 1px solid var(--mdn-border); border-radius: 6px; padding: 1.25rem 1.5rem; background: var(--mdn-surface); }
-        .stat-box .stat-num { font-size: 2rem; font-weight: 700; color: var(--mdn-blue); line-height: 1; }
-        .stat-box .stat-lbl { font-size: 0.82rem; color: var(--mdn-muted); margin-top: 4px; }
-        /* Table */
-        .mdn-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        .mdn-table thead th { background: var(--mdn-surface); color: var(--mdn-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.65rem 1rem; border-bottom: 2px solid var(--mdn-border); }
-        .mdn-table tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--mdn-border); vertical-align: middle; font-size: 0.9rem; }
+ 
+        /* ─── Navbar ─────────────────────────────────────────────── */
+        .sm-nav {
+            background: var(--navy);
+            border-bottom: 1px solid var(--navy-border);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+ 
+        .sm-nav .container {
+            display: flex;
+            align-items: stretch;
+            min-height: 58px;
+        }
+ 
+        /* Brand */
+        .sm-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff !important;
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
+            padding: 0 1.5rem 0 0;
+            border-right: 1px solid var(--navy-border);
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+ 
+        .sm-brand .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+ 
+        .sm-brand .brand-sub {
+            color: var(--accent);
+        }
+ 
+        /* Nav links */
+        .sm-nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 2px;
+            flex: 1;
+        }
+ 
+        .sm-nav-links .nav-link {
+            color: #94a3b8 !important;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.4rem 0.75rem !important;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, color 0.15s;
+            text-decoration: none;
+        }
+ 
+        .sm-nav-links .nav-link:hover {
+            background: rgba(255,255,255,0.07);
+            color: #fff !important;
+        }
+ 
+        .sm-nav-links .nav-link i {
+            font-size: 0.9rem;
+        }
+ 
+        /* Nav right */
+        .sm-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+ 
+        .nav-user-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--navy-border);
+            border-radius: 20px;
+            padding: 5px 12px 5px 6px;
+            color: #cbd5e1;
+            font-size: 0.82rem;
+        }
+ 
+        .nav-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+ 
+        /* Navbar toggler */
+        .navbar-toggler {
+            border: 1px solid var(--navy-border) !important;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .navbar-toggler:focus { box-shadow: none; }
+ 
+        /* ─── Buttons ────────────────────────────────────────────── */
+        .btn-mdn {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, transform 0.1s;
+            text-decoration: none;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        .btn-mdn:hover { background: var(--blue-dk); color: #fff; transform: translateY(-1px); }
+        .btn-mdn:active { transform: translateY(0); }
+ 
+        .btn-mdn-outline {
+            border: 1.5px solid var(--blue);
+            color: var(--blue);
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 0.38rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+            text-decoration: none;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        .btn-mdn-outline:hover { background: var(--blue); color: #fff; }
+ 
+        .btn-ghost-white {
+            background: rgba(255,255,255,0.08);
+            color: #94a3b8;
+            border: 1px solid var(--navy-border);
+            border-radius: 6px;
+            font-size: 0.84rem;
+            font-weight: 500;
+            padding: 0.4rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+            text-decoration: none;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        .btn-ghost-white:hover { background: rgba(255,255,255,0.14); color: #fff; border-color: #475569; }
+ 
+        /* ─── Toast / Alert strip ────────────────────────────────── */
+        .alert-strip {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+        }
+ 
+        .alert-strip .container {
+            padding-top: 0.6rem;
+            padding-bottom: 0.6rem;
+        }
+ 
+        .alert {
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: 1px solid transparent;
+            padding: 0.65rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.4rem;
+        }
+ 
+        .alert:last-child { margin-bottom: 0; }
+        .alert-success  { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+        .alert-danger   { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+        .alert-warning  { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .alert-info     { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+        .btn-close { opacity: 0.5; }
+ 
+        /* ─── Page wrapper ───────────────────────────────────────── */
+        .sm-main {
+            flex: 1;
+            padding: 2rem 0 4rem;
+        }
+ 
+        /* ─── Page header ────────────────────────────────────────── */
+        .mdn-page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+ 
+        .mdn-page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin: 0 0 0.15rem;
+            line-height: 1.2;
+        }
+ 
+        .mdn-page-header p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.875rem;
+        }
+ 
+        /* ─── Cards ──────────────────────────────────────────────── */
+        .mdn-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+ 
+        .mdn-card-header {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        /* ─── Stat boxes ─────────────────────────────────────────── */
+        .stat-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+ 
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--blue);
+            border-radius: 10px 10px 0 0;
+        }
+ 
+        .stat-box:hover {
+            box-shadow: 0 4px 16px rgba(37,99,235,0.1);
+            transform: translateY(-2px);
+        }
+ 
+        .stat-box .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--blue);
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+ 
+        .stat-box .stat-lbl {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+ 
+        /* ─── Table ──────────────────────────────────────────────── */
+        .mdn-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+ 
+        .mdn-table thead th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            padding: 0.7rem 1.1rem;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+ 
+        .mdn-table tbody td {
+            padding: 0.8rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+ 
         .mdn-table tbody tr:last-child td { border-bottom: none; }
-        .mdn-table tbody tr:hover { background: var(--mdn-surface); }
-        /* Forms */
-        .form-control, .form-select { border: 1.5px solid var(--mdn-border); border-radius: 4px; font-size: 0.9rem; padding: 0.45rem 0.75rem; }
-        .form-control:focus, .form-select:focus { border-color: var(--mdn-blue); box-shadow: 0 0 0 3px rgba(0,105,194,0.15); }
-        .form-label { font-size: 0.88rem; font-weight: 600; color: var(--mdn-text); margin-bottom: 0.3rem; }
-        /* Badge */
-        .mdn-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: 600; background: #e8f0fe; color: var(--mdn-blue); }
-        /* Pagination */
-        .page-link { color: var(--mdn-blue); border-color: var(--mdn-border); font-size: 0.85rem; }
-        .page-item.active .page-link { background: var(--mdn-blue); border-color: var(--mdn-blue); }
-        /* Alert */
-        .alert { border-radius: 4px; font-size: 0.88rem; border: none; }
-        /* Footer */
-        .mdn-footer { background: var(--mdn-navy); color: #888; font-size: 0.78rem; padding: 1.25rem 0; margin-top: 4rem; text-align: center; }
-        /* Avatar */
-        .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--mdn-blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .mdn-table tbody tr {
+            transition: background 0.1s;
+        }
+        .mdn-table tbody tr:hover { background: #f8fafc; }
+ 
+        /* ─── Forms ──────────────────────────────────────────────── */
+        .form-control, .form-select {
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.85rem;
+            background: var(--surface);
+            color: var(--text);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+ 
+        .form-control:focus, .form-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+            outline: none;
+        }
+ 
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+ 
+        /* ─── Badge ──────────────────────────────────────────────── */
+        .mdn-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--blue-lt);
+            color: var(--blue);
+            border: 1px solid #bfdbfe;
+        }
+ 
+        /* ─── Avatar ─────────────────────────────────────────────── */
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dk) 100%);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+ 
+        /* ─── Pagination ─────────────────────────────────────────── */
+        .page-link {
+            color: var(--blue);
+            border-color: var(--border);
+            font-size: 0.85rem;
+            border-radius: 6px !important;
+            margin: 0 2px;
+            padding: 0.35rem 0.7rem;
+        }
+ 
+        .page-item.active .page-link {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+ 
+        /* ─── Footer ─────────────────────────────────────────────── */
+        .mdn-footer {
+            background: var(--navy);
+            color: #475569;
+            font-size: 0.78rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            border-top: 1px solid var(--navy-border);
+            margin-top: auto;
+        }
+ 
+        .mdn-footer strong { color: #64748b; }
+ 
+        /* ─── Responsive ─────────────────────────────────────────── */
+        @media (max-width: 991.98px) {
+            .sm-brand {
+                border-right: none;
+                padding-right: 0;
+            }
+ 
+            #navMenu {
+                border-top: 1px solid var(--navy-border);
+                padding: 0.75rem 0;
+                margin-top: 0.5rem;
+            }
+ 
+            .sm-nav-right {
+                flex-wrap: wrap;
+                padding: 0.5rem 0 0.25rem;
+                gap: 8px;
+            }
+ 
+            .sm-nav .container {
+                flex-wrap: wrap;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
-
-<nav class="mdn-nav navbar navbar-expand-lg">
+ 
+<!-- ─── Navbar ────────────────────────────────────────────────────── -->
+<nav class="sm-nav navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand" href="{% if request.user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">
-            <i class="bi bi-mortarboard me-1"></i>Student<span>Master</span>
+        <a class="sm-brand" href="{% if request.user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">
+            <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+            Student<span class="brand-sub">Master</span>
         </a>
-        <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-            <span class="navbar-toggler-icon"></span>
+ 
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <i class="bi bi-list text-white" style="font-size:1.3rem;"></i>
         </button>
+ 
         <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav me-auto ms-3">
+            
+ 
+            <div class="sm-nav-right ms-auto">
                 {% if request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'student_list' %}"><i class="bi bi-people me-1"></i>Students</a>
-                </li>
-                {% endif %}
-            </ul>
-            <div class="d-flex align-items-center gap-2">
-                {% if request.user.is_authenticated %}
-                    <span class="mdn-nav nav-user"><i class="bi bi-person-circle me-1"></i>{{ request.user.username }}</span>
-                    <a href="{% url 'dashboard' %}" class="btn btn-mdn btn-sm"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-                    <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-secondary text-white border-secondary">Logout</a>
+                    <span class="nav-user-pill">
+                        <span class="nav-avatar">{{ request.user.username|first|upper }}</span>
+                        {{ request.user.username }}
+                    </span>
+                    <a href="{% url 'dashboard' %}" class="btn-mdn btn-sm">
+                        </i> Dashboard
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn-ghost-white btn-sm">
+                        Logout
+                    </a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary text-white border-secondary">Student Login</a>
-                    <a href="{% url 'staff_login' %}" class="btn btn-mdn btn-sm">Staff Login</a>
+                    <a href="{% url 'login' %}" class="btn-ghost-white btn-sm">
+                        <i class="bi bi-person"></i> Student Login
+                    </a>
+                    <a href="{% url 'staff_login' %}" class="btn-mdn btn-sm">
+                        <i class="bi bi-shield-lock"></i> Staff Login
+                    </a>
                 {% endif %}
             </div>
         </div>
     </div>
 </nav>
-
-<div class="container mt-3">
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
+ 
+<!-- ─── Flash messages ─────────────────────────────────────────────── -->
+{% if messages %}
+<div class="alert-strip">
+    <div class="container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+                {% elif message.tags == 'danger' or message.tags == 'error' %}<i class="bi bi-x-circle-fill"></i>
+                {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>
+                {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
+                {{ message }}
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
-<div class="container mt-4 mb-5">
-    {% block content %}{% endblock %}
-</div>
-
+{% endif %}
+ 
+<!-- ─── Main content ───────────────────────────────────────────────── -->
+<main class="sm-main">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+ 
+<!-- ─── Footer ────────────────────────────────────────────────────── -->
+<footer class="mdn-footer">
+    <div class="container">
+        <strong>StudentMaster</strong> &nbsp;·&nbsp; Student Management System
+    </div>
+</footer>
+ 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
