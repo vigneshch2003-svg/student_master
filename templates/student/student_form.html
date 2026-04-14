@@ -1,204 +1,225 @@
 {% extends 'base.html' %}
-
-{% block title %}
-    {% if form.instance.pk %}Edit Student{% else %}Add Student{% endif %}
-{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit Student{% else %}Add Student{% endif %}{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width:900px;">
-
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold mb-1">
-                {% if form.instance.pk %}Edit Student{% else %}Add New Student{% endif %}
-            </h3>
-            <small class="text-muted">
-                {% if form.instance.pk %}Update student details{% else %}Enter student information clearly{% endif %}
-            </small>
-        </div>
-        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
-    </div>
-
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <!-- PERSONAL INFO -->
-        <div class="card section-card">
-            <div class="section-title">Personal Information</div>
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="form-label">Full Name</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="field-error">{{ form.name.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Roll Number</label>
-                    {{ form.roll_number }}
-                    {% if form.roll_number.errors %}
-                        <div class="field-error">{{ form.roll_number.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Gender</label>
-                    {{ form.gender }}
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Date of Birth</label>
-                    {{ form.date_of_birth }}
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Profile Image</label>
-                    {{ form.profile_image }}
-
-                    {% if form.instance.profile_image %}
-                    <div class="profile-preview">
-                        <img src="{{ form.instance.profile_image.url }}">
-                        <span>Current</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Address</label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                        <div class="field-error">{{ form.address.errors }}</div>
-                    {% endif %}
-                </div>
-
-            </div>
-        </div>
-
-        <!-- CONTACT INFO -->
-        <div class="card section-card">
-            <div class="section-title">Contact Information</div>
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="form-label">Email Address</label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="field-error">{{ form.email.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Phone Number</label>
-                    {{ form.phone }}
-                    {% if form.phone.errors %}
-                        <div class="field-error">{{ form.phone.errors }}</div>
-                    {% endif %}
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ACADEMIC INFO -->
-        <div class="card section-card">
-            <div class="section-title">Academic Details</div>
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <label class="form-label">Course</label>
-                    {{ form.course }}
-                    {% if form.course.errors %}
-                        <div class="field-error">{{ form.course.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Year</label>
-                    {{ form.year }}
-                    {% if form.year.errors %}
-                        <div class="field-error">{{ form.year.errors }}</div>
-                    {% endif %}
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ACTIONS -->
-        <div class="d-flex justify-content-between mt-4">
-            <a href="{% url 'student_list' %}" class="btn btn-light">
-                Cancel
-            </a>
-
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-{% if form.instance.pk %}check-lg{% else %}person-plus{% endif %}"></i>
-                {% if form.instance.pk %}Update Student{% else %}Save Student{% endif %}
-            </button>
-        </div>
-
-    </form>
-</div>
+<div class="row justify-content-center">
+<div class="col-md-5">
 
 <style>
+  .sf-page-title  { font-size:1.5rem; font-weight:700; color:#1c1e21; margin-bottom:.25rem; }
+  .sf-page-sub    { font-size:.88rem; color:#65676b; margin-bottom:1.75rem; }
 
-/* Section Card */
-.section-card {
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-}
+  .sf-section     { margin-bottom:1.4rem; }
+  .sf-label       { display:block; font-size:.95rem; font-weight:700; color:#1c1e21; margin-bottom:.45rem; }
+  .sf-hint        { font-size:.78rem; color:#65676b; margin-top:.3rem; }
 
-/* Section Title */
-.section-title {
-    font-weight: 600;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    color: #111827;
-}
+  .sf-input,
+  .sf-select,
+  .sf-textarea {
+    display:block; width:100%;
+    padding:.78rem 1rem;
+    background:#f0f2f5;
+    border:1.5px solid #f0f2f5;
+    border-radius:14px;
+    font-size:.95rem;
+    color:#1c1e21;
+    outline:none;
+    transition:border-color .15s, background .15s;
+    appearance:none; -webkit-appearance:none;
+  }
+  .sf-input::placeholder,
+  .sf-textarea::placeholder { color:#bcc0c4; }
+  .sf-input:focus,
+  .sf-select:focus,
+  .sf-textarea:focus {
+    background:#fff;
+    border-color:#1877f2;
+    box-shadow:0 0 0 3px rgba(24,119,242,.15);
+  }
+  .sf-textarea { resize:vertical; min-height:90px; }
 
-/* Inputs */
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-}
+  /* two-col row */
+  .sf-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.4rem; }
 
-input:focus, select:focus, textarea:focus {
-    border-color: #2563eb;
-    outline: none;
-}
+  .sf-error { color:#e02020; font-size:.8rem; margin-top:.3rem; }
 
-/* Profile preview */
-.profile-preview {
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+  .sf-divider { border:none; border-top:1px solid #e4e6eb; margin:1.6rem 0; }
 
-.profile-preview img {
-    width: 45px;
-    height: 45px;
-    border-radius: 10px;
-    object-fit: cover;
-}
+  /* file input */
+  .sf-file-wrap { position:relative; }
+  .sf-file-wrap input[type=file] {
+    display:block; width:100%;
+    padding:.65rem 1rem;
+    background:#f0f2f5;
+    border:1.5px dashed #ccd0d5;
+    border-radius:14px;
+    font-size:.88rem; color:#65676b;
+    cursor:pointer;
+  }
+  .sf-file-wrap input[type=file]:hover { border-color:#1877f2; }
 
-/* Error */
-.field-error {
-    font-size: 0.75rem;
-    color: red;
-    margin-top: 4px;
-}
+  /* submit */
+  .sf-submit {
+    display:block; width:100%;
+    padding:.85rem;
+    background:#1877f2;
+    color:#fff;
+    border:none;
+    border-radius:50px;
+    font-size:1rem; font-weight:700;
+    cursor:pointer;
+    transition:background .15s;
+    margin-top:1.75rem;
+    letter-spacing:.2px;
+  }
+  .sf-submit:hover { background:#166fe5; }
 
+  .sf-cancel {
+    display:block; text-align:center;
+    margin-top:.85rem;
+    font-size:.88rem; color:#65676b;
+    text-decoration:none;
+  }
+  .sf-cancel:hover { text-decoration:underline; }
+
+  /* current photo */
+  .sf-photo-preview {
+    display:flex; align-items:center; gap:10px;
+    margin-top:.6rem;
+  }
+  .sf-photo-preview img {
+    width:48px; height:48px;
+    border-radius:50%; object-fit:cover;
+    border:2px solid #e4e6eb;
+  }
 </style>
 
+<p class="sf-page-title">
+  {% if form.instance.pk %}Edit Student{% else %}Add New Student{% endif %}
+</p>
+<p class="sf-page-sub">
+  {% if form.instance.pk %}Update the student's information below{% else %}Fill in the details to register a new student{% endif %}
+</p>
+
+<div style="background:#fff;border:2px solid #dddfe2;border-radius:16px;padding:1.75rem 2rem">
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- Full Name -->
+  <div class="sf-section">
+    <label class="sf-label">Full Name</label>
+    <input type="text" name="name" class="sf-input"
+           placeholder="Full name"
+           value="{{ form.name.value|default:'' }}">
+    {% if form.name.errors %}<div class="sf-error">{{ form.name.errors.0 }}</div>{% endif %}
+  </div>
+
+  <!-- Roll Number -->
+  <div class="sf-section">
+    <label class="sf-label">Roll Number</label>
+    <input type="text" name="roll_number" class="sf-input"
+           placeholder="e.g. ROLL0001"
+           value="{{ form.roll_number.value|default:'' }}">
+    {% if form.roll_number.errors %}<div class="sf-error">{{ form.roll_number.errors.0 }}</div>{% endif %}
+  </div>
+
+  <!-- Email + Phone side by side -->
+  <div class="sf-row">
+    <div>
+      <label class="sf-label">Email</label>
+      <input type="email" name="email" class="sf-input"
+             placeholder="Email address"
+             value="{{ form.email.value|default:'' }}">
+      {% if form.email.errors %}<div class="sf-error">{{ form.email.errors.0 }}</div>{% endif %}
+    </div>
+    <div>
+      <label class="sf-label">Phone</label>
+      <input type="text" name="phone" class="sf-input"
+             placeholder="10-digit number"
+             value="{{ form.phone.value|default:'' }}">
+      {% if form.phone.errors %}<div class="sf-error">{{ form.phone.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  <hr class="sf-divider">
+
+  <!-- Date of Birth -->
+  <div class="sf-section">
+    <label class="sf-label">Date of Birth</label>
+    <input type="date" name="date_of_birth" class="sf-input"
+           value="{{ form.date_of_birth.value|default:'' }}">
+    <p class="sf-hint">Used as the student's login password (YYYY-MM-DD format)</p>
+    {% if form.date_of_birth.errors %}<div class="sf-error">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+  </div>
+
+  <!-- Gender -->
+  <div class="sf-section">
+    <label class="sf-label">Gender</label>
+    <select name="gender" class="sf-select">
+      <option value="" disabled {% if not form.gender.value %}selected{% endif %}>Select gender</option>
+      <option value="Male"   {% if form.gender.value == 'Male'   %}selected{% endif %}>Male</option>
+      <option value="Female" {% if form.gender.value == 'Female' %}selected{% endif %}>Female</option>
+    </select>
+    {% if form.gender.errors %}<div class="sf-error">{{ form.gender.errors.0 }}</div>{% endif %}
+  </div>
+
+  <hr class="sf-divider">
+
+  <!-- Course + Year side by side -->
+  <div class="sf-row">
+    <div>
+      <label class="sf-label">Course</label>
+      <select name="course" class="sf-select">
+        <option value="">Select course</option>
+        {% for course in form.course.field.queryset %}
+        <option value="{{ course.pk }}"
+          {% if form.course.value|stringformat:"s" == course.pk|stringformat:"s" %}selected{% endif %}>
+          {{ course.name }}
+        </option>
+        {% endfor %}
+      </select>
+      {% if form.course.errors %}<div class="sf-error">{{ form.course.errors.0 }}</div>{% endif %}
+    </div>
+    <div>
+      <label class="sf-label">Year</label>
+      <input type="number" name="year" class="sf-input"
+             placeholder="e.g. 1" min="1" max="6"
+             value="{{ form.year.value|default:'' }}">
+      {% if form.year.errors %}<div class="sf-error">{{ form.year.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="sf-section">
+    <label class="sf-label">Address</label>
+    <textarea name="address" class="sf-textarea"
+              placeholder="Full address">{{ form.address.value|default:'' }}</textarea>
+    {% if form.address.errors %}<div class="sf-error">{{ form.address.errors.0 }}</div>{% endif %}
+  </div>
+
+  <!-- Profile Photo -->
+  <div class="sf-section">
+    <label class="sf-label">Profile Photo <span style="font-weight:400;color:#65676b">(optional)</span></label>
+    <div class="sf-file-wrap">
+      <input type="file" name="profile_image" accept="image/*">
+    </div>
+    {% if form.instance.profile_image %}
+    <div class="sf-photo-preview">
+      <img src="{{ form.instance.profile_image.url }}" alt="Current photo">
+      <span style="font-size:.82rem;color:#65676b">Current photo</span>
+    </div>
+    {% endif %}
+    {% if form.profile_image.errors %}<div class="sf-error">{{ form.profile_image.errors.0 }}</div>{% endif %}
+  </div>
+
+  <button type="submit" class="sf-submit">
+    {% if form.instance.pk %}Update Student{% else %}Add Student{% endif %}
+  </button>
+  <a href="{% url 'student_list' %}" class="sf-cancel">Cancel</a>
+
+</form>
+</div>
+
+</div>
+</div>
 {% endblock %}

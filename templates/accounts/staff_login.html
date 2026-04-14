@@ -2,33 +2,49 @@
 {% block title %}Staff Login{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-4">
-        <div class="mdn-page-header text-center" style="border:none;padding-bottom:0.5rem">
-            <h1 style="font-size:1.5rem">Staff Login</h1>
-            <p>Admin and Staff sign in here</p>
-        </div>
-        <div class="mdn-card">
-            <div class="p-4">
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="Your username" required autofocus>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Your password" required>
-                    </div>
-                    <button type="submit" class="btn btn-mdn w-100">Log in</button>
-                </form>
-                <hr style="border-color:var(--mdn-border)">
-                <div class="d-flex justify-content-between" style="font-size:0.85rem">
-                    <span style="color:var(--mdn-muted)">Student? <a href="{% url 'login' %}" style="color:var(--mdn-blue);font-weight:600">Student Login &rarr;</a></span>
-                    <a href="{% url 'register' %}" style="color:var(--mdn-blue);font-weight:600">Create account</a>
-                </div>
-            </div>
-        </div>
+<style>
+  body { background: #eef2f7 !important; }
+  .lw { min-height:75vh; display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem; }
+  .lb { width:100%; max-width:420px; }
+  .lt { display:flex; align-items:flex-start; gap:1.5rem; margin-bottom:1.5rem; }
+  .lh { font-size:1.6rem; font-weight:900; color:#0d1117; line-height:1.15; flex-shrink:0; }
+  .ls { font-size:.85rem; color:#8a9ab0; line-height:1.5; padding-top:.2rem; }
+  .lc { background:#fff; border-radius:14px; padding:1.6rem 1.75rem; box-shadow:0 2px 14px rgba(0,0,0,.07); }
+  .ll { display:block; font-size:.82rem; font-weight:700; color:#0d1117; margin-bottom:.4rem; }
+  .li { display:block; width:100%; padding:.65rem .9rem; border:1.5px solid #dde3ec; border-radius:9px; font-size:.9rem; color:#0d1117; background:#fff; outline:none; transition:border-color .15s,box-shadow .15s; }
+  .li:focus { border-color:#3b6ef8; box-shadow:0 0 0 3px rgba(59,110,248,.13); }
+  .li::placeholder { color:#c5cdd8; }
+  .lg { margin-bottom:1.1rem; }
+  .lbtn { display:block; width:100%; padding:.75rem; background:#3b6ef8; color:#fff; border:none; border-radius:50px; font-size:.92rem; font-weight:700; cursor:pointer; transition:background .15s; margin-top:.4rem; }
+  .lbtn:hover { background:#2a5ce0; }
+  .lf { border-top:1px solid #eef0f4; margin-top:1.25rem; padding-top:.9rem; display:flex; justify-content:space-between; font-size:.82rem; color:#8a9ab0; }
+  .lf a { color:#0d1117; font-weight:700; text-decoration:underline; }
+</style>
+
+<div class="lw">
+  <div class="lb">
+    <div class="lt">
+      <div class="lh">Staff<br>Login</div>
+      <div class="ls">Admin and Staff sign in here</div>
     </div>
+    <div class="lc">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="lg">
+          <label class="ll">Username</label>
+          <input type="text" name="username" class="li" required autofocus>
+        </div>
+        <div class="lg">
+          <label class="ll">Password</label>
+          <input type="password" name="password" class="li" required>
+        </div>
+        <button type="submit" class="lbtn">Log in as Staff</button>
+      </form>
+      <div class="lf">
+        <span>Student? <a href="{% url 'login' %}">Student Login &rarr;</a></span>
+        <a href="{% url 'register' %}">Create account</a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

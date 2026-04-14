@@ -2,36 +2,55 @@
 {% block title %}Create Staff Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-5">
-        <div class="mdn-page-header text-center" style="border:none;padding-bottom:0.5rem">
-            <h1 style="font-size:1.5rem">Create Staff Account</h1>
-            <p>Register as Admin or Staff</p>
-        </div>
-        <div class="mdn-card">
-            <div class="p-4">
-                <form method="POST">
-                    {% csrf_token %}
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                        <div class="text-danger mt-1" style="font-size:0.82rem">{% for e in field.errors %}{{ e }}{% endfor %}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-mdn w-100 mt-1">Create account</button>
-                </form>
-                <hr style="border-color:var(--mdn-border)">
-                <p class="text-center mb-0" style="font-size:0.85rem;color:var(--mdn-muted)">
-                    Already have an account? <a href="{% url 'staff_login' %}" style="color:var(--mdn-blue);font-weight:600">Staff Login &rarr;</a>
-                </p>
-            </div>
-        </div>
+<style>
+  body { background: #eef2f7 !important; }
+  .lw { min-height:75vh; display:flex; align-items:center; justify-content:center; padding:1.5rem 1rem; }
+  .lb { width:100%; max-width:460px; }
+  .lt { display:flex; align-items:flex-start; gap:1.5rem; margin-bottom:1.5rem; }
+  .lh { font-size:1.6rem; font-weight:900; color:#0d1117; line-height:1.15; flex-shrink:0; }
+  .ls { font-size:.85rem; color:#8a9ab0; line-height:1.5; padding-top:.2rem; }
+  .lc { background:#fff; border-radius:14px; padding:1.6rem 1.75rem; box-shadow:0 2px 14px rgba(0,0,0,.07); }
+  .ll { display:block; font-size:.82rem; font-weight:700; color:#0d1117; margin-bottom:.4rem; }
+  .li { display:block; width:100%; padding:.65rem .9rem; border:1.5px solid #dde3ec; border-radius:9px; font-size:.9rem; color:#0d1117; background:#fff; outline:none; transition:border-color .15s,box-shadow .15s; }
+  .li:focus { border-color:#3b6ef8; box-shadow:0 0 0 3px rgba(59,110,248,.13); }
+  .li::placeholder { color:#c5cdd8; }
+  .lg { margin-bottom:1.1rem; }
+  .le { color:#dc2626; font-size:.78rem; margin-top:.3rem; }
+  .lbtn { display:block; width:100%; padding:.75rem; background:#3b6ef8; color:#fff; border:none; border-radius:50px; font-size:.92rem; font-weight:700; cursor:pointer; transition:background .15s; margin-top:.4rem; }
+  .lbtn:hover { background:#2a5ce0; }
+  .lf { border-top:1px solid #eef0f4; margin-top:1.25rem; padding-top:.9rem; text-align:center; font-size:.82rem; color:#8a9ab0; }
+  .lf a { color:#0d1117; font-weight:700; text-decoration:underline; }
+</style>
+
+<div class="lw">
+  <div class="lb">
+    <div class="lt">
+      <div class="lh">Create<br>Account</div>
+      <div class="ls">Register as Admin or Staff to manage students</div>
     </div>
+    <div class="lc">
+      <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="lg">
+          <label for="{{ field.id_for_label }}" class="ll">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <div class="le">{% for e in field.errors %}{{ e }}{% endfor %}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% if form.non_field_errors %}
+        <div style="background:#fff0f0;border:1.5px solid #fecaca;border-radius:9px;padding:.6rem .9rem;font-size:.82rem;color:#dc2626;margin-bottom:.9rem">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <button type="submit" class="lbtn">Create account</button>
+      </form>
+      <div class="lf">
+        Already have an account? <a href="{% url 'staff_login' %}">Staff Login &rarr;</a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

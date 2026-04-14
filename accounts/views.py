@@ -7,7 +7,7 @@ from .forms import StaffRegisterForm
 
 def student_login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
+        username = request.POST.get('username', '').strip()  #strip is used to remove extra spacees .
         password = request.POST.get('password', '').strip()
         user = authenticate(request, username=username, password=password)
         if user is not None and user.groups.filter(name='Student').exists():

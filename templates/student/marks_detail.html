@@ -30,6 +30,7 @@
                     <th class="text-center">Total Marks</th>
                     <th class="text-center">Percentage</th>
                     <th class="text-center">Grade</th>
+                    {% if is_admin or is_staff %}<th class="text-center">Action</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -46,10 +47,17 @@
                         {% elif mark.grade == 'D' %}<span class="badge bg-warning text-dark px-3">D</span>
                         {% else %}<span class="badge bg-danger px-3">F</span>{% endif %}
                     </td>
+                    {% if is_admin or is_staff %}
+                    <td class="text-center">
+                        <a href="{% url 'marks_update' mark.id %}" class="tbl-btn tbl-btn-amber">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center py-5" style="color:var(--mdn-muted)">
+                    <td colspan="{% if is_admin or is_staff %}6{% else %}5{% endif %}" class="text-center py-5" style="color:var(--mdn-muted)">
                         <i class="bi bi-journal-x fs-2 d-block mb-2"></i>No marks recorded yet.
                     </td>
                 </tr>

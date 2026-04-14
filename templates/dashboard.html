@@ -1,245 +1,284 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
- 
+
 {% block content %}
- 
-<!-- ─── Page Header ─────────────────────────────────────────────────── -->
-<div class="mdn-page-header">
-    <div>
-        <h1>Dashboard</h1>
-        <p>
-            Welcome back, <strong>{{ request.user.username }}</strong> &nbsp;&mdash;&nbsp;
-            {% if is_admin %}<span class="mdn-badge" style="background:#fef2f2;color:#b91c1c;border-color:#fecaca;"><i class="bi bi-shield-fill"></i> Admin</span>
-            {% elif is_staff %}<span class="mdn-badge" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;"><i class="bi bi-person-badge"></i> Staff</span>
-            {% else %}<span class="mdn-badge" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;"><i class="bi bi-mortarboard"></i> Student</span>{% endif %}
-        </p>
-    </div>
-    {% if is_admin or is_staff %}
-    <a href="{% url 'student_create' %}" class="btn-mdn">
-        <i class="bi bi-plus-lg"></i> Add Student
-    </a>
-    {% endif %}
+<style>
+  /* ── Gradient header ── */
+  .dash-header {
+    background: linear-gradient(135deg, #1877f2 0%, #0f4fa8 100%);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .dash-header h2 { color:#fff; font-weight:800; margin:0 0 .2rem; font-size:1.4rem; }
+  .dash-header p  { color:rgba(255,255,255,.8); margin:0; font-size:.88rem; }
+  .dash-role { display:inline-block; padding:2px 10px; border-radius:50px; font-size:.75rem; font-weight:700; background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.35); }
+
+  /* ── Stat card ── */
+  .stat-card {
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:1.25rem 1.4rem;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    transition:transform .18s, box-shadow .18s;
+  }
+  .stat-card:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,.09); }
+  .stat-icon { width:50px; height:50px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:1.35rem; flex-shrink:0; }
+  .stat-num  { font-size:1.85rem; font-weight:800; line-height:1; color:var(--text); }
+  .stat-lbl  { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); margin-top:3px; }
+
+  /* ── Profile fields ── */
+  .pf { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:.6rem .85rem; }
+  .pf-lbl { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:2px; }
+  .pf-val { font-weight:600; font-size:.9rem; color:var(--text); }
+
+  /* ── Action rows ── */
+  .act-row {
+    display:flex; align-items:center; gap:12px;
+    padding:.8rem 1rem;
+    border:1px solid var(--border);
+    border-radius:10px;
+    text-decoration:none;
+    color:var(--text);
+    background:#fff;
+    transition:border-color .15s, box-shadow .15s, transform .12s, background .15s;
+  }
+  .act-row:hover { border-color:var(--blue); box-shadow:0 4px 14px rgba(24,119,242,.12); transform:translateX(4px); background:#f0f6ff; color:var(--text); }
+  .act-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+  .act-title { font-weight:700; font-size:.88rem; flex:1; }
+  .act-arrow { color:var(--muted); font-size:.78rem; }
+
+  /* ── Section divider label ── */
+  .section-label {
+    font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.7px; color:var(--muted);
+    margin-bottom:.75rem;
+    display:flex; align-items:center; gap:6px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+</style>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     GRADIENT HEADER
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="dash-header">
+  <div>
+    <h2>Dashboard</h2>
+    <p>
+      Welcome back, <strong>{{ request.user.username }}</strong> &mdash;
+      {% if is_admin %}<span class="dash-role"><i class="bi bi-shield-fill me-1"></i>Admin</span>
+      {% elif is_staff %}<span class="dash-role"><i class="bi bi-person-badge me-1"></i>Staff</span>
+      {% else %}<span class="dash-role"><i class="bi bi-mortarboard me-1"></i>Student</span>{% endif %}
+    </p>
+  </div>
 </div>
- 
-<!-- ─── Student Profile View ────────────────────────────────────────── -->
-{% if student_profile %}
-<div class="mdn-card" style="max-width:560px">
- 
-    <!-- Profile hero -->
-    <div style="padding:1.75rem 1.5rem 1.25rem; display:flex; align-items:center; gap:1.1rem; background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 100%); border-bottom:1px solid var(--border);">
-        {% if student_profile.profile_image %}
-            <img src="{{ student_profile.profile_image.url }}"
-                 style="width:60px;height:60px;border-radius:12px;object-fit:cover;border:2px solid var(--border);">
-        {% else %}
-            <div class="avatar-circle" style="width:60px;height:60px;font-size:1.4rem;border-radius:14px;">
-                {{ student_profile.name|first|upper }}
-            </div>
-        {% endif %}
-        <div>
-            <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;line-height:1.2;">{{ student_profile.name }}</div>
-            <div style="color:var(--muted);font-size:0.84rem;margin-top:2px;">{{ student_profile.email }}</div>
-        </div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ROW 1 — SUMMARY CARDS (admin/staff) or CGPA HIGHLIGHT (student)
+     ════════════════════════════════════════════════════════════════════ -->
+{% if summary %}
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#e7f3ff;color:#1877f2"><i class="bi bi-people-fill"></i></div>
+      <div><div class="stat-num">{{ summary.total_students }}</div><div class="stat-lbl">Total Students</div></div>
     </div>
- 
-    <!-- Profile detail grid -->
-    <div style="padding:1.4rem 1.5rem;">
-        <div class="row g-3">
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-hash me-1"></i>Student ID</div>
-                    <div class="profile-value">{{ student_profile.roll_number }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-book me-1"></i>Course</div>
-                    <div class="profile-value">{{ student_profile.course }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-layers me-1"></i>Year</div>
-                    <div class="profile-value">Year {{ student_profile.year }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-person me-1"></i>Gender</div>
-                    <div class="profile-value">{{ student_profile.gender }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-phone me-1"></i>Phone</div>
-                    <div class="profile-value">{{ student_profile.phone }}</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="profile-field">
-                    <div class="profile-label"><i class="bi bi-calendar3 me-1"></i>Date of Birth</div>
-                    <div class="profile-value">{{ student_profile.date_of_birth|date:"d M Y" }}</div>
-                </div>
-            </div>
-        </div>
- 
-        <!-- Actions -->
-        <div style="margin-top:1.4rem;padding-top:1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-            <a href="{% url 'marks_detail' student_profile.id %}" class="btn-mdn">
-                <i class="bi bi-bar-chart-line"></i> View My Marks
-            </a>
-            <a href="{% url 'logout' %}" class="btn-mdn-outline" style="color:var(--muted);border-color:var(--border);">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-        </div>
+  </div>
+  <div class="col-12 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f3e8ff;color:#7c3aed"><i class="bi bi-book-fill"></i></div>
+      <div><div class="stat-num">{{ summary.total_courses }}</div><div class="stat-lbl">Total Courses</div></div>
     </div>
-</div>
- 
-<!-- ─── Staff / Admin Action Panel ─────────────────────────────────── -->
-{% else %}
-<div class="row g-3">
- 
-    <!-- Quick Actions card -->
-    <div class="col-12 col-md-7">
-        <div class="mdn-card h-100">
-            <div class="mdn-card-header"><i class="bi bi-lightning-charge me-1"></i>Quick Actions</div>
-            <div style="padding:1.5rem;display:flex;flex-direction:column;gap:10px;">
- 
-                <a href="{% url 'student_list' %}" class="action-row">
-                    <div class="action-icon" style="background:#eff6ff;color:#2563eb;">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <div class="action-text">
-                        <div class="action-title">View Students</div>
-                        
-                    </div>
-                    <i class="bi bi-chevron-right action-arrow"></i>
-                </a>
- 
-                {% if is_admin or is_staff %}
-                <a href="{% url 'student_create' %}" class="action-row">
-                    <div class="action-icon" style="background:#f0fdf4;color:#15803d;">
-                        <i class="bi bi-person-plus-fill"></i>
-                    </div>
-                    <div class="action-text">
-                        <div class="action-title">Add Student</div>
-                        
-                    </div>
-                    <i class="bi bi-chevron-right action-arrow"></i>
-                </a>
-                {% endif %}
- 
-                {% if is_admin %}
-                <a href="{% url 'course_list' %}" class="action-row">
-                    <div class="action-icon" style="background:#faf5ff;color:#7c3aed;">
-                        <i class="bi bi-book-fill"></i>
-                    </div>
-                    <div class="action-text">
-                        <div class="action-title">Manage Courses</div>
-                        
-                    </div>
-                    <i class="bi bi-chevron-right action-arrow"></i>
-                </a>
-                {% endif %}
- 
-            </div>
-        </div>
+  </div>
+  <div class="col-12 col-sm-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#dcfce7;color:#15803d"><i class="bi bi-person-badge-fill"></i></div>
+      <div><div class="stat-num">{{ summary.total_staff }}</div><div class="stat-lbl">Total Staff</div></div>
     </div>
- 
-    <!-- Session card -->
-    <div class="col-12 col-md-5">
-        <div class="mdn-card h-100">
-            <div class="mdn-card-header">
-                <i class="bi bi-person-circle" style="color:var(--blue)"></i>
-                Session
-            </div>
-            <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem;">
- 
-                <!-- User row -->
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div class="avatar-circle" style="width:44px;height:44px;font-size:1.1rem;border-radius:11px;flex-shrink:0;">
-                        {{ request.user.username|first|upper }}
-                    </div>
-                    <div style="min-width:0;">
-                        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ request.user.username }}</div>
-                        <div style="font-size:0.78rem;color:var(--muted);margin-top:1px;">
-                            {% if is_admin %}<i class="bi bi-shield-fill me-1" style="color:#ef4444;"></i>Administrator
-                            {% elif is_staff %}<i class="bi bi-person-badge-fill me-1" style="color:var(--blue);"></i>Staff Member
-                            {% else %}<i class="bi bi-mortarboard-fill me-1" style="color:#15803d;"></i>Student{% endif %}
-                        </div>
-                    </div>
-                </div>
- 
-                
-                
- 
-                <!-- Sign out -->
-                <a href="{% url 'logout' %}" class="btn-mdn-outline" style="color:var(--muted);border-color:var(--border);justify-content:center;padding:0.45rem;">
-                    <i class="bi bi-box-arrow-right"></i> Sign out
-                </a>
- 
-            </div>
-        </div>
-    </div>
- 
+  </div>
 </div>
 {% endif %}
- 
-<!-- ─── Scoped styles ───────────────────────────────────────────────── -->
-<style>
-    /* Profile field */
-    .profile-field {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 0.65rem 0.85rem;
-    }
-    .profile-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        color: var(--muted);
-        margin-bottom: 3px;
-    }
-    .profile-value {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--text);
-    }
- 
-    /* Action row */
-    .action-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0.85rem 1rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        text-decoration: none;
-        color: var(--text);
-        transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
-        background: var(--surface);
-    }
-    .action-row:hover {
-        border-color: var(--blue);
-        box-shadow: 0 2px 10px rgba(37,99,235,0.1);
-        transform: translateX(3px);
-        color: var(--text);
-    }
-    .action-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
-    .action-text { flex: 1; }
-    .action-title { font-weight: 600; font-size: 0.9rem; line-height: 1.2; }
-    .action-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .action-arrow { color: var(--muted); font-size: 0.8rem; }
-</style>
- 
+
+{% if student_profile and student_profile.cgpa %}
+<div class="fb-card mb-4 p-3 d-flex align-items-center gap-3"
+     style="background:linear-gradient(135deg,#e7f3ff,#f0fdf4);border-color:#bfdbfe;max-width:360px">
+  <div style="width:52px;height:52px;border-radius:14px;background:#fff;border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;color:#d97706;font-size:1.5rem;flex-shrink:0">
+    <i class="bi bi-star-fill"></i>
+  </div>
+  <div>
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">My CGPA</div>
+    <div style="font-size:2rem;font-weight:800;color:var(--blue);line-height:1">
+      {{ student_profile.cgpa }}
+      <span style="font-size:.9rem;font-weight:600;color:var(--muted)">/ 10.0</span>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ROW 2 — PROFILE (student) or ACTIONS + SESSION (admin/staff)
+     ════════════════════════════════════════════════════════════════════ -->
+{% if student_profile %}
+<div class="fb-card mb-4">
+  <!-- Profile hero -->
+  <div style="padding:1.5rem;display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,#e7f3ff,#f8fafc);border-bottom:1px solid var(--border)">
+    {% if student_profile.profile_image %}
+      <img src="{{ student_profile.profile_image.url }}"
+           style="width:58px;height:58px;border-radius:12px;object-fit:cover;border:2px solid var(--border);flex-shrink:0">
+    {% else %}
+      <div class="fb-avatar" style="width:58px;height:58px;font-size:1.35rem;border-radius:13px;flex-shrink:0">
+        {{ student_profile.name|first|upper }}
+      </div>
+    {% endif %}
+    <div>
+      <div style="font-size:1.1rem;font-weight:800">{{ student_profile.name }}</div>
+      <div style="color:var(--muted);font-size:.83rem;margin-top:2px">{{ student_profile.email }}</div>
+    </div>
+  </div>
+
+  <!-- Detail grid -->
+  <div style="padding:1.25rem 1.5rem">
+    <div class="row g-2">
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-hash me-1"></i>Student ID</div><div class="pf-val">{{ student_profile.roll_number }}</div></div></div>
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-book me-1"></i>Course</div><div class="pf-val">{{ student_profile.course|default:"—" }}</div></div></div>
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-layers me-1"></i>Year</div><div class="pf-val">Year {{ student_profile.year }}</div></div></div>
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-person me-1"></i>Gender</div><div class="pf-val">{{ student_profile.gender }}</div></div></div>
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-phone me-1"></i>Phone</div><div class="pf-val">{{ student_profile.phone }}</div></div></div>
+      <div class="col-6 col-md-4"><div class="pf"><div class="pf-lbl"><i class="bi bi-calendar3 me-1"></i>Date of Birth</div><div class="pf-val">{{ student_profile.date_of_birth|date:"d M Y" }}</div></div></div>
+    </div>
+
+    <!-- Actions -->
+    <div style="margin-top:1.25rem;padding-top:1.1rem;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+      <a href="{% url 'marks_detail' student_profile.id %}"
+         style="display:inline-flex;align-items:center;gap:6px;padding:.65rem 1.4rem;background:#3b6ef8;color:#fff;border:none;border-radius:50px;font-size:.88rem;font-weight:700;text-decoration:none;transition:background .15s"
+         onmouseover="this.style.background='#2a5ce0'" onmouseout="this.style.background='#3b6ef8'">
+        <i class="bi bi-bar-chart-line"></i> View My Marks
+      </a>
+    
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="row g-3 mb-4">
+
+  <!-- Actions card -->
+  <div class="col-12 col-md-7">
+    <div class="fb-card h-100">
+      <div class="fb-card-header"><i class="bi bi-lightning-charge me-1"></i>Actions</div>
+      <div style="padding:1.1rem;display:flex;flex-direction:column;gap:7px">
+        <a href="{% url 'student_list' %}" class="act-row">
+          <div class="act-icon" style="background:#e7f3ff;color:#1877f2"><i class="bi bi-people-fill"></i></div>
+          <span class="act-title">View Students</span>
+          <i class="bi bi-chevron-right act-arrow"></i>
+        </a>
+        {% if is_admin or is_staff %}
+        <a href="{% url 'student_create' %}" class="act-row">
+          <div class="act-icon" style="background:#dcfce7;color:#15803d"><i class="bi bi-person-plus-fill"></i></div>
+          <span class="act-title">Add Student</span>
+          <i class="bi bi-chevron-right act-arrow"></i>
+        </a>
+        
+        {% endif %}
+        {% if is_admin %}
+        <a href="{% url 'course_list' %}" class="act-row">
+          <div class="act-icon" style="background:#f3e8ff;color:#7c3aed"><i class="bi bi-book-fill"></i></div>
+          <span class="act-title">Manage Courses</span>
+          <i class="bi bi-chevron-right act-arrow"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Session card -->
+  <div class="col-12 col-md-5">
+    <div class="fb-card h-100" style="border:2px solid var(--border)">
+      <div class="fb-card-header" style="border-bottom:2px solid var(--border)"><i class="bi bi-person-circle me-1"></i>Session</div>
+      <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem">
+        <div style="display:flex;align-items:center;gap:12px">
+          
+          <div>
+            <div style="font-weight:800;font-size:.95rem">{{ request.user.username }}</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:2px">
+              {% if is_admin %}<i class="bi bi-shield-fill me-1" style="color:#ef4444"></i>Administrator
+              {% elif is_staff %}<i class="bi bi-person-badge-fill me-1" style="color:var(--blue)"></i>Staff Member
+              {% else %}<i class="bi bi-mortarboard-fill me-1" style="color:#15803d"></i>Student{% endif %}
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:.85rem">
+          <a href="{% url 'logout' %}" class="btn-ghost w-100" style="text-align:center;display:block">
+            <i class="bi bi-box-arrow-right me-1"></i>Sign out
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ROW 3 — TOP CGPA PER COURSE (all roles)
+     ════════════════════════════════════════════════════════════════════ -->
+{% if top_performers %}
+<div class="section-label mt-4">
+  <i class="bi bi-trophy-fill" style="color:#d97706"></i> Top CGPA Students </span>
+</div>
+<div class="fb-card">
+  <div class="table-responsive">
+    <table class="fb-table" style="border-collapse:separate;border-spacing:0">
+      <thead>
+        <tr>
+          <th style="padding:.75rem 1.25rem;width:40px">#</th>
+          <th style="padding:.75rem 1.25rem">Course</th>
+          <th style="padding:.75rem 1.25rem">Top Student</th>
+          <th style="padding:.75rem 1.25rem;text-align:center">CGPA</th>
+          <th style="padding:.75rem 1.25rem;text-align:center">Scale</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tp in top_performers %}
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:.9rem 1.25rem;color:var(--muted);font-size:.82rem;font-weight:600">
+            {{ forloop.counter }}
+          </td>
+          <td style="padding:.9rem 1.25rem">
+            <span style="display:inline-block;padding:4px 12px;border-radius:50px;font-size:.8rem;font-weight:700;background:#f3e8ff;color:#7c3aed;border:1px solid #e9d5ff">
+              {{ tp.course }}
+            </span>
+          </td>
+          <td style="padding:.9rem 1.25rem">
+            <div style="display:flex;align-items:center;gap:10px">
+            
+              <span style="font-weight:600;font-size:.9rem">{{ tp.student }}</span>
+            </div>
+          </td>
+          <td style="padding:.9rem 1.25rem;text-align:center">
+            <span style="display:inline-block;padding:4px 14px;border-radius:50px;font-size:.95rem;font-weight:800;border:2px solid;
+              {% if tp.cgpa >= 9 %}color:#15803d;border-color:#bbf7d0;background:#f0fdf4
+              {% endif %}">
+              {{ tp.cgpa }}
+            </span>
+          </td>
+          <td style="padding:.9rem 1.25rem;text-align:center;color:var(--muted);font-size:.85rem">
+            / 10.0
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

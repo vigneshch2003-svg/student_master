@@ -14,7 +14,7 @@ class Course(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_profile') #only one user is assinged to one student .
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_profile')
     name = models.CharField(max_length=100)
     roll_number = models.CharField(max_length=20, unique=True)
     email = models.EmailField(max_length=100, unique=True)
@@ -28,6 +28,15 @@ class Student(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def cgpa(self):
+        """Average percentage across all subjects converted to 10-point CGPA."""
+        marks = list(self.marks_set.all())
+        if not marks:
+            return None
+        avg_pct = sum(m.percentage for m in marks) / len(marks)
+        return round(avg_pct / 10, 2)
 
 
 class Marks(models.Model):

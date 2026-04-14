@@ -7,26 +7,25 @@ class CourseForm(forms.ModelForm):
         model = Course
         fields = ['name', 'description']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'name': forms.TextInput(attrs={'class': 'fb-input'}),
+            'description': forms.Textarea(attrs={'class': 'fb-textarea', 'rows': 3}),
         }
 
 
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = ['name','roll_number','email','phone','course','date_of_birth','profile_image','address','gender','year']
+        exclude = ['user']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'roll_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'course': forms.Select(attrs={'class': 'form-select'}),
-            'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'profile_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'gender': forms.Select(attrs={'class': 'form-select'}),
-            'year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'fb-input'}),
+            'roll_number': forms.TextInput(attrs={'class': 'fb-input'}),
+            'email': forms.EmailInput(attrs={'class': 'fb-input'}),
+            'phone': forms.TextInput(attrs={'class': 'fb-input'}),
+            'course': forms.Select(attrs={'class': 'fb-select'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'fb-input', 'type': 'date'}),
+            'address': forms.Textarea(attrs={'class': 'fb-textarea', 'rows': 3}),
+            'gender': forms.Select(attrs={'class': 'fb-select'}),
+            'year': forms.NumberInput(attrs={'class': 'fb-input'}),
         }
 
 
@@ -35,13 +34,24 @@ class MarksForm(forms.ModelForm):
         model = Marks
         fields = '__all__'
         widgets = {
-            'student': forms.Select(attrs={'class': 'form-select'}),
-            'subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'marks_obtained': forms.NumberInput(attrs={'class': 'form-control'}),
-            'total_marks': forms.NumberInput(attrs={'class': 'form-control'}),
+            'student': forms.Select(attrs={'class': 'fb-select'}),
+            'subject': forms.TextInput(attrs={'class': 'fb-input'}),
+            'marks_obtained': forms.NumberInput(attrs={'class': 'fb-input'}),
+            'total_marks': forms.NumberInput(attrs={'class': 'fb-input'}),
         }
 
-    def clean(self):                         #clean is used for self validation of form data.
+    def __init__(self, *args, **kwargs):
+        student = kwargs.pop('student', None)
+        super().__init__(*args, **kwargs)
+        if student:
+            # Restrict student dropdown to same course only
+            if student.course:
+                self.fields['student'].queryset = Student.objects.filter(course=student.course)
+            else:
+                self.fields['student'].queryset = Student.objects.filter(pk=student.pk)
+            self.fields['student'].initial = student.pk
+
+    def clean(self):
         cleaned_data = super().clean()
         total_marks = cleaned_data.get('total_marks')
         marks_obtained = cleaned_data.get('marks_obtained')
