@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Delete Staff{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <div style="background:#fff;border:2px solid #fecaca;border-radius:16px;overflow:hidden">
+            <div style="background:#fef2f2;border-bottom:2px solid #fecaca;padding:.75rem 1.25rem;font-weight:700;font-size:.88rem;color:#b91c1c">
+                <i class="bi bi-exclamation-triangle-fill me-1" style="color:#ef4444"></i>
+                Delete Staff Account
+            </div>
+            <div style="padding:2rem 1.75rem;text-align:center">
+                <div style="width:60px;height:60px;border-radius:16px;background:#fef2f2;border:1px solid #fecaca;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem">
+                    <i class="bi bi-person-x-fill" style="font-size:1.6rem;color:#ef4444"></i>
+                </div>
+                <p style="color:#64748b;font-size:.875rem;margin-bottom:.4rem">You are about to permanently delete:</p>
+                <div style="font-size:1.2rem;font-weight:800;margin-bottom:.3rem">{{ staff_user.username }}</div>
+                <div style="color:#64748b;font-size:.85rem;margin-bottom:1.5rem">{{ staff_user.email|default:"No email" }}</div>
+                <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:.85rem 1rem;text-align:left;margin-bottom:1.5rem;font-size:.84rem;color:#7f1d1d">
+                    <i class="bi bi-exclamation-circle-fill me-1" style="color:#ef4444"></i>
+                    This will permanently delete the staff account. This action <strong>cannot be undone</strong>.
+                </div>
+                <form method="POST" style="display:flex;gap:10px;justify-content:center">
+                    {% csrf_token %}
+                    <a href="{% url 'staff_list_admin' %}"
+                       style="display:inline-flex;align-items:center;padding:.5rem 1.4rem;background:#fff;border:1.5px solid #dde3ec;border-radius:50px;font-size:.88rem;font-weight:600;color:#374151;text-decoration:none">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:.5rem 1.4rem;background:#ef4444;color:#fff;border:none;border-radius:50px;font-size:.88rem;font-weight:700;cursor:pointer">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

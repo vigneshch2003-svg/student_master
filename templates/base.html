@@ -486,7 +486,7 @@
 </head>
 <body>
  
-<!-- ─── Navbar ────────────────────────────────────────────────────── -->
+<!-- Navbar  -->
 <nav class="sm-nav navbar navbar-expand-lg">
     <div class="container">
         <a class="sm-brand" href="{% if request.user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">
@@ -526,7 +526,7 @@
     </div>
 </nav>
  
-<!-- ─── Flash messages ─────────────────────────────────────────────── -->
+<!--  Flash messages  -->
 {% if messages %}
 <div class="alert-strip">
     <div class="container">
@@ -544,14 +544,14 @@
 </div>
 {% endif %}
  
-<!-- ─── Main content ───────────────────────────────────────────────── -->
+<!-- Main content -->
 <main class="sm-main">
     <div class="container">
         {% block content %}{% endblock %}
     </div>
 </main>
  
-<!-- ─── Footer ────────────────────────────────────────────────────── -->
+<!--  Footer  -->
 <footer class="mdn-footer">
     <div class="container">
         <strong>StudentMaster</strong> &nbsp;·&nbsp; Student Management System

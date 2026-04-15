@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}{% if staff_user %}Edit Staff{% else %}Add Staff{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+
+<style>
+  .sf-page-title { font-size:1.5rem; font-weight:700; color:#1c1e21; margin-bottom:.25rem; }
+  .sf-page-sub   { font-size:.88rem; color:#65676b; margin-bottom:1.75rem; }
+  .sf-section    { margin-bottom:1.4rem; }
+  .sf-label      { display:block; font-size:.95rem; font-weight:700; color:#1c1e21; margin-bottom:.45rem; }
+  .sf-label span { font-weight:400; color:#65676b; font-size:.85rem; }
+  .sf-hint       { font-size:.78rem; color:#65676b; margin-top:.3rem; }
+  .sf-input {
+    display:block; width:100%; padding:.78rem 1rem;
+    background:#f0f2f5; border:1.5px solid #f0f2f5;
+    border-radius:14px; font-size:.95rem; color:#1c1e21;
+    outline:none; transition:border-color .15s, background .15s;
+    appearance:none; -webkit-appearance:none;
+  }
+  .sf-input::placeholder { color:#bcc0c4; }
+  .sf-input:focus { background:#fff; border-color:#1877f2; box-shadow:0 0 0 3px rgba(24,119,242,.15); }
+  .sf-row    { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.4rem; }
+  .sf-error  { color:#e02020; font-size:.8rem; margin-top:.3rem; }
+  .sf-divider { border:none; border-top:1px solid #e4e6eb; margin:1.6rem 0; }
+  .sf-submit { display:block; width:100%; padding:.85rem; background:#1877f2; color:#fff; border:none; border-radius:50px; font-size:1rem; font-weight:700; cursor:pointer; transition:background .15s; margin-top:1.75rem; }
+  .sf-submit:hover { background:#166fe5; }
+  .sf-cancel { display:block; text-align:center; margin-top:.85rem; font-size:.88rem; color:#65676b; text-decoration:none; }
+  .sf-cancel:hover { text-decoration:underline; }
+</style>
+
+<p class="sf-page-title">{% if staff_user %}Edit Staff{% else %}Add Staff{% endif %}</p>
+<p class="sf-page-sub">
+  {% if staff_user %}Update information for <strong>{{ staff_user.username }}</strong>
+  {% else %}Create a new Staff or Admin account{% endif %}
+</p>
+
+{% if staff_user %}
+<div style="display:flex;align-items:center;gap:12px;padding:.9rem 1.1rem;background:#f0f6ff;border:1.5px solid #bfdbfe;border-radius:14px;margin-bottom:1.75rem">
+    <div class="fb-avatar" style="width:40px;height:40px;font-size:1rem;border-radius:10px;flex-shrink:0">{{ staff_user.username|first|upper }}</div>
+    <div>
+        <div style="font-weight:700;font-size:.92rem">{{ staff_user.username }}</div>
+        <div style="font-size:.78rem;color:#65676b">{{ staff_user.email|default:"No email" }}</div>
+    </div>
+</div>
+{% endif %}
+
+<div style="background:#fff;border:2px solid #dddfe2;border-radius:16px;padding:1.75rem 2rem">
+<form method="POST">
+  {% csrf_token %}
+
+  <!-- Username -->
+  <div class="sf-section">
+    <label class="sf-label">Username</label>
+    <input type="text" name="username" class="sf-input"
+           value="{{ form.username.value|default:'' }}">
+    {% if form.username.errors %}<div class="sf-error">{{ form.username.errors.0 }}</div>{% endif %}
+  </div>
+
+  <!-- Email -->
+  <div class="sf-section">
+    <label class="sf-label">Email</label>
+    <input type="email" name="email" class="sf-input"
+           value="{{ form.email.value|default:'' }}">
+    {% if form.email.errors %}<div class="sf-error">{{ form.email.errors.0 }}</div>{% endif %}
+  </div>
+
+  <hr class="sf-divider">
+
+  <!-- Password side by side -->
+  <div class="sf-row">
+    <div>
+      <label class="sf-label">Password {% if staff_user %}<span>(optional)</span>{% endif %}</label>
+      <input type="password" name="password1" class="sf-input"
+             placeholder="{% if staff_user %}Leave blank to keep{% else %}Password{% endif %}">
+      {% if form.password1.errors %}<div class="sf-error">{{ form.password1.errors.0 }}</div>{% endif %}
+    </div>
+    <div>
+      <label class="sf-label">Confirm Password</label>
+      <input type="password" name="password2" class="sf-input" placeholder="Repeat password">
+      {% if form.password2.errors %}<div class="sf-error">{{ form.password2.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  <hr class="sf-divider">
+
+  <!-- Role + Subject side by side -->
+  <div class="sf-row">
+    <div>
+      <label class="sf-label">Role</label>
+      <select name="role" class="sf-input">
+        <option value="Staff" {% if form.initial.role == 'Staff' or form.role.value == 'Staff' %}selected{% endif %}>Staff</option>
+        <option value="Admin" {% if form.initial.role == 'Admin' or form.role.value == 'Admin' %}selected{% endif %}>Admin</option>
+      </select>
+      {% if form.role.errors %}<div class="sf-error">{{ form.role.errors.0 }}</div>{% endif %}
+    </div>
+    <div> 
+      <label class="sf-label">Subject <span>(Staff only)</span></label>
+      <input type="text" name="subject" class="sf-input"
+             placeholder="e.g. Mathematics"
+             value="{{ form.initial.subject|default:form.subject.value|default:'' }}">
+      {% if form.subject.errors %}<div class="sf-error">{{ form.subject.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+  <div style="background:#fff0f0;border:1.5px solid #fecaca;border-radius:14px;padding:.75rem 1rem;font-size:.85rem;color:#dc2626;margin-bottom:1rem">
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="sf-submit">
+    {% if staff_user %}Save Changes{% else %}Create Account{% endif %}
+  </button>
+  <a href="{% url 'staff_list_admin' %}" class="sf-cancel">Cancel</a>
+</form>
+</div>
+
+</div>
+</div>
+{% endblock %}

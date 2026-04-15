@@ -1,5 +1,5 @@
 from django import forms
-from .models import Student, Marks, Course
+from .models import Student, Marks, Course, StaffProfile
 
 
 class CourseForm(forms.ModelForm):
@@ -42,14 +42,24 @@ class MarksForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         student = kwargs.pop('student', None)
+        staff_user = kwargs.pop('staff_user', None)
         super().__init__(*args, **kwargs)
         if student:
-            # Restrict student dropdown to same course only
             if student.course:
                 self.fields['student'].queryset = Student.objects.filter(course=student.course)
             else:
                 self.fields['student'].queryset = Student.objects.filter(pk=student.pk)
             self.fields['student'].initial = student.pk
+        # Lock subject to staff's assigned subject
+        if staff_user and not staff_user.is_superuser and not staff_user.groups.filter(name='Admin').exists():
+            try:
+                profile = staff_user.staff_profile
+                self.fields['subject'].initial = profile.subject
+                self.fields['subject'].widget.attrs['value'] = profile.subject
+                self.fields['subject'].widget.attrs['readonly'] = True
+                self.fields['subject'].widget.attrs['style'] = 'background:#f0f2f5;cursor:not-allowed'
+            except StaffProfile.DoesNotExist:
+                pass
 
     def clean(self):
         cleaned_data = super().clean()

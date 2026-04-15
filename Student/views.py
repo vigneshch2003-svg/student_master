@@ -5,14 +5,19 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User, Group
-from .models import Student, Marks, Course
+from .models import Student, Marks, Course, StaffProfile
 from .forms import StudentForm, MarksForm, CourseForm
 
 
+def _is_admin(user):
+    return user.is_superuser or user.groups.filter(name='Admin').exists()
+
+def _is_staff_member(user):
+    return user.groups.filter(name='Staff').exists()
+
+
 def _sync_student_user(student, old_roll=None, old_dob=None):
-    """Create or update the Django User linked to this student.
-    username = roll_number, password = date_of_birth (YYYY-MM-DD).
-    Password is only reset when roll_number or DOB actually changes."""
+
     dob_str = student.date_of_birth.strftime('%Y-%m-%d')
     student_group, _ = Group.objects.get_or_create(name='Student')
 
@@ -35,12 +40,13 @@ def _sync_student_user(student, old_roll=None, old_dob=None):
         student.save(update_fields=['user'])
 
 
-# ── Dashboard ──────────────────────────────────────────────────────────────
+
+
 
 @login_required
 def dashboard(request):
-    is_admin = request.user.groups.filter(name='Admin').exists()
-    is_staff = request.user.groups.filter(name='Staff').exists()
+    is_admin = _is_admin(request.user)
+    is_staff = _is_staff_member(request.user)
     is_student = request.user.groups.filter(name='Student').exists()
 
     student_profile = None
@@ -62,7 +68,7 @@ def dashboard(request):
             ).distinct().count(),
         }
 
-    # Top CGPA student per course (visible to all roles)
+    # Top CGPA student per course
     top_performers = []
     for course in Course.objects.all():
         students_in_course = Student.objects.filter(course=course).prefetch_related('marks_set')
@@ -90,12 +96,11 @@ def dashboard(request):
     })
 
 
-# ── Student CRUD ───────────────────────────────────────────────────────────
 
 @login_required
 def student_list(request):
-    is_admin = request.user.groups.filter(name='Admin').exists()
-    is_staff = request.user.groups.filter(name='Staff').exists()
+    is_admin = _is_admin(request.user)
+    is_staff = _is_staff_member(request.user)
     is_student = request.user.groups.filter(name='Student').exists()
 
     if is_student and not is_admin and not is_staff:
@@ -124,8 +129,8 @@ def student_list(request):
 
 @login_required
 def student_create(request):
-    if not (request.user.groups.filter(name='Admin').exists() or
-            request.user.groups.filter(name='Staff').exists()):
+    if not (_is_admin(request.user) or
+            _is_staff_member(request.user)):
         raise PermissionDenied
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
@@ -142,8 +147,8 @@ def student_create(request):
 
 @login_required
 def student_update(request, pk):
-    if not (request.user.groups.filter(name='Admin').exists() or
-            request.user.groups.filter(name='Staff').exists()):
+    if not (_is_admin(request.user) or
+            _is_staff_member(request.user)):
         raise PermissionDenied
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -161,7 +166,7 @@ def student_update(request, pk):
 
 @login_required
 def student_delete(request, pk):
-    if not request.user.groups.filter(name='Admin').exists():
+    if not _is_admin(request.user):
         raise PermissionDenied
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -171,48 +176,47 @@ def student_delete(request, pk):
     return render(request, 'student/student_delete.html', {'student': student})
 
 
-# ── Marks ──────────────────────────────────────────────────────────────────
 
 @login_required
 def marks_create(request, student_pk):
-    if not (request.user.groups.filter(name='Admin').exists() or
-            request.user.groups.filter(name='Staff').exists()):
+    if not (_is_admin(request.user) or
+            _is_staff_member(request.user)):
         raise PermissionDenied
     student = get_object_or_404(Student, pk=student_pk)
     if request.method == 'POST':
-        form = MarksForm(request.POST, student=student)
+        form = MarksForm(request.POST, student=student, staff_user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Marks added successfully!')
             return redirect('marks_detail', pk=student_pk)
     else:
-        form = MarksForm(student=student)
+        form = MarksForm(student=student, staff_user=request.user)
     return render(request, 'student/marks_form.html', {'form': form, 'student': student})
 
 
 @login_required
 def marks_update(request, pk):
-    if not (request.user.groups.filter(name='Admin').exists() or
-            request.user.groups.filter(name='Staff').exists()):
+    if not (_is_admin(request.user) or
+            _is_staff_member(request.user)):
         raise PermissionDenied
     mark = get_object_or_404(Marks, pk=pk)
     student = mark.student
     if request.method == 'POST':
-        form = MarksForm(request.POST, instance=mark, student=student)
+        form = MarksForm(request.POST, instance=mark, student=student, staff_user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Marks updated successfully!')
             return redirect('marks_detail', pk=student.pk)
     else:
-        form = MarksForm(instance=mark, student=student)
+        form = MarksForm(instance=mark, student=student, staff_user=request.user)
     return render(request, 'student/marks_form.html', {'form': form, 'student': student, 'editing': True})
 
 
 @login_required
 def marks_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    is_admin = request.user.groups.filter(name='Admin').exists()
-    is_staff = request.user.groups.filter(name='Staff').exists()
+    is_admin = _is_admin(request.user)
+    is_staff = _is_staff_member(request.user)
     is_student = request.user.groups.filter(name='Student').exists()
 
     if is_student and not is_admin and not is_staff:
@@ -226,18 +230,17 @@ def marks_detail(request, pk):
     })
 
 
-# ── Courses ────────────────────────────────────────────────────────────────
 
 @login_required
 def course_list(request):
-    if not request.user.groups.filter(name='Admin').exists():
+    if not _is_admin(request.user):
         raise PermissionDenied
     return render(request, 'student/course_list.html', {'courses': Course.objects.all()})
 
 
 @login_required
 def course_create(request):
-    if not request.user.groups.filter(name='Admin').exists():
+    if not _is_admin(request.user):
         raise PermissionDenied
     form = CourseForm(request.POST or None)
     if form.is_valid():
@@ -249,7 +252,7 @@ def course_create(request):
 
 @login_required
 def course_update(request, pk):
-    if not request.user.groups.filter(name='Admin').exists():
+    if not _is_admin(request.user):
         raise PermissionDenied
     course = get_object_or_404(Course, pk=pk)
     form = CourseForm(request.POST or None, instance=course)
@@ -262,7 +265,7 @@ def course_update(request, pk):
 
 @login_required
 def course_delete(request, pk):
-    if not request.user.groups.filter(name='Admin').exists():
+    if not _is_admin(request.user):
         raise PermissionDenied
     course = get_object_or_404(Course, pk=pk)
     if request.method == 'POST':
@@ -272,3 +275,97 @@ def course_delete(request, pk):
     return render(request, 'student/course_delete.html', {'course': course})
 
 
+
+
+
+
+
+@login_required
+def staff_list(request):
+    if not _is_admin(request.user):
+        raise PermissionDenied
+    from django.contrib.auth.models import User as AuthUser
+    staff_users = AuthUser.objects.filter(
+        groups__name__in=['Admin', 'Staff']
+    ).exclude(pk=request.user.pk).prefetch_related('groups', 'staff_profile').distinct()
+   
+    for s in staff_users:
+        s.role = 'Admin' if s.groups.filter(name='Admin').exists() else 'Staff'
+    return render(request, 'student/staff_list.html', {'staff_users': staff_users})
+
+
+@login_required
+def staff_create(request):
+    if not _is_admin(request.user):
+        raise PermissionDenied
+    from accounts.forms import StaffForm
+    from django.contrib.auth.models import Group
+    if request.method == 'POST':
+        form = StaffForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            role = form.cleaned_data['role']
+            group, _ = Group.objects.get_or_create(name=role)
+            user.groups.add(group)
+            subject = form.cleaned_data.get('subject', '').strip()
+            if role == 'Staff' and subject:
+                StaffProfile.objects.update_or_create(user=user, defaults={'subject': subject})
+            messages.success(request, f'Staff "{user.username}" created.')
+            return redirect('staff_list_admin')
+    else:
+        form = StaffForm()
+    return render(request, 'student/staff_form.html', {'form': form})
+
+
+@login_required
+def staff_update(request, user_pk):
+    if not _is_admin(request.user):
+        raise PermissionDenied
+    from django.contrib.auth.models import User as AuthUser, Group
+    from accounts.forms import StaffForm
+    staff_user = get_object_or_404(AuthUser, pk=user_pk)
+    profile, _ = StaffProfile.objects.get_or_create(user=staff_user)
+    current_role = 'Admin' if staff_user.groups.filter(name='Admin').exists() else 'Staff'
+    if request.method == 'POST':
+        form = StaffForm(request.POST, instance=staff_user)
+        if form.is_valid():
+            form.save()
+            role = form.cleaned_data['role']
+            staff_user.groups.clear()
+            group, _ = Group.objects.get_or_create(name=role)
+            staff_user.groups.add(group)
+            subject = form.cleaned_data.get('subject', '').strip()
+            profile.subject = subject
+            profile.save()
+            messages.success(request, f'Staff "{staff_user.username}" updated.')
+            return redirect('staff_list_admin')
+    else:
+        form = StaffForm(instance=staff_user, initial={'role': current_role, 'subject': profile.subject})
+    return render(request, 'student/staff_form.html', {'form': form, 'staff_user': staff_user})
+
+
+@login_required
+def staff_delete(request, user_pk):
+    if not _is_admin(request.user):
+        raise PermissionDenied
+    from django.contrib.auth.models import User as AuthUser
+    staff_user = get_object_or_404(AuthUser, pk=user_pk)
+    if request.method == 'POST':
+        username = staff_user.username
+        staff_user.delete()
+        messages.success(request, f'Staff "{username}" deleted.')
+        return redirect('staff_list_admin')
+    return render(request, 'student/staff_delete.html', {'staff_user': staff_user})
+
+
+@login_required
+def marks_delete(request, pk):
+    if not (_is_admin(request.user) or _is_staff_member(request.user)):
+        raise PermissionDenied
+    mark = get_object_or_404(Marks, pk=pk)
+    student_pk = mark.student.pk
+    if request.method == 'POST':
+        mark.delete()
+        messages.success(request, 'Mark deleted successfully.')
+        return redirect('marks_detail', pk=student_pk)
+    return render(request, 'student/marks_delete.html', {'mark': mark})

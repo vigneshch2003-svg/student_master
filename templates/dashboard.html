@@ -66,9 +66,7 @@
   .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
 </style>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     GRADIENT HEADER
-     ════════════════════════════════════════════════════════════════════ -->
+<!--GRADIENT HEADER -->
 <div class="dash-header">
   <div>
     <h2>Dashboard</h2>
@@ -81,9 +79,7 @@
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     ROW 1 — SUMMARY CARDS (admin/staff) or CGPA HIGHLIGHT (student)
-     ════════════════════════════════════════════════════════════════════ -->
+<!-- ROW 1 — SUMMARY CARDS (admin/staff) or CGPA HIGHLIGHT (student) -->
 {% if summary %}
 <div class="row g-3 mb-4">
   <div class="col-12 col-sm-4">
@@ -123,9 +119,7 @@
 </div>
 {% endif %}
 
-<!-- ════════════════════════════════════════════════════════════════════
-     ROW 2 — PROFILE (student) or ACTIONS + SESSION (admin/staff)
-     ════════════════════════════════════════════════════════════════════ -->
+<!-- ROW 2 — PROFILE (student) or ACTIONS + SESSION (admin/staff) -->
 {% if student_profile %}
 <div class="fb-card mb-4">
   <!-- Profile hero -->
@@ -194,32 +188,42 @@
           <span class="act-title">Manage Courses</span>
           <i class="bi bi-chevron-right act-arrow"></i>
         </a>
+        <a href="{% url 'staff_list_admin' %}" class="act-row">
+          <div class="act-icon" style="background:#fef9c3;color:#a16207"><i class="bi bi-people-fill"></i></div>
+          <span class="act-title">View Staff</span>
+          <i class="bi bi-chevron-right act-arrow"></i>
+        </a>
+        <a href="{% url 'staff_create' %}" class="act-row">
+          <div class="act-icon" style="background:#fef2f2;color:#dc2626"><i class="bi bi-person-badge-fill"></i></div>
+          <span class="act-title">Register Staff</span>
+          <i class="bi bi-chevron-right act-arrow"></i>
+        </a>
         {% endif %}
       </div>
     </div>
   </div>
 
   <!-- Session card -->
-  <div class="col-12 col-md-5">
-    <div class="fb-card h-100" style="border:2px solid var(--border)">
-      <div class="fb-card-header" style="border-bottom:2px solid var(--border)"><i class="bi bi-person-circle me-1"></i>Session</div>
-      <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem">
-        <div style="display:flex;align-items:center;gap:12px">
-          
-          <div>
-            <div style="font-weight:800;font-size:.95rem">{{ request.user.username }}</div>
-            <div style="font-size:.78rem;color:var(--muted);margin-top:2px">
-              {% if is_admin %}<i class="bi bi-shield-fill me-1" style="color:#ef4444"></i>Administrator
-              {% elif is_staff %}<i class="bi bi-person-badge-fill me-1" style="color:var(--blue)"></i>Staff Member
-              {% else %}<i class="bi bi-mortarboard-fill me-1" style="color:#15803d"></i>Student{% endif %}
-            </div>
+  <div class="col-12 col-md-5" style="margin-top: 55px;">
+    <div style="border:3px solid #ffffff;border-radius:12px;overflow:hidden;background:#ffffff">
+      <div style="background:#1f64a9;border-bottom:3px solid #fafbfc;padding:.55rem 1rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fcfcfc">
+        <i class="bi bi-person-circle me-1"></i>Session
+      </div>
+      <div style="padding:.9rem 1rem;display:flex;align-items:center;gap:10px">
+        <div>
+          <div style="font-weight:800;font-size:.88rem;color:#0d1117">{{ request.user.username }}</div>
+          <div style="font-size:.75rem;color:#64748b;margin-top:1px">
+            {% if is_admin %}<i class="bi bi-shield-fill me-1" style="color:#ef4444"></i>Administrator
+            {% elif is_staff %}<i class="bi bi-person-badge-fill me-1" style="color:#3b6ef8"></i>Staff Member
+            {% else %}<i class="bi bi-mortarboard-fill me-1" style="color:#15803d"></i>Student{% endif %}
           </div>
         </div>
-        <div style="border-top:1px solid var(--border);padding-top:.85rem">
-          <a href="{% url 'logout' %}" class="btn-ghost w-100" style="text-align:center;display:block">
-            <i class="bi bi-box-arrow-right me-1"></i>Sign out
-          </a>
-        </div>
+      </div>
+      <div style="border-top:3px solid #dde3ec;padding:.6rem 1rem">
+        <a href="{% url 'logout' %}"
+           style="display:flex;align-items:center;justify-content:center;gap:6px;padding:.45rem;background:#fff0f0;border:1.5px solid #fecaca;border-radius:8px;font-size:.82rem;font-weight:700;color:#dc2626;text-decoration:none">
+          <i class="bi bi-box-arrow-right"></i> Sign out
+        </a>
       </div>
     </div>
   </div>
@@ -227,9 +231,7 @@
 </div>
 {% endif %}
 
-<!-- ════════════════════════════════════════════════════════════════════
-     ROW 3 — TOP CGPA PER COURSE (all roles)
-     ════════════════════════════════════════════════════════════════════ -->
+<!-- ROW 3 — TOP CGPA PER COURSE (all roles)-->
 {% if top_performers %}
 <div class="section-label mt-4">
   <i class="bi bi-trophy-fill" style="color:#d97706"></i> Top CGPA Students </span>
@@ -239,7 +241,6 @@
     <table class="fb-table" style="border-collapse:separate;border-spacing:0">
       <thead>
         <tr>
-          <th style="padding:.75rem 1.25rem;width:40px">#</th>
           <th style="padding:.75rem 1.25rem">Course</th>
           <th style="padding:.75rem 1.25rem">Top Student</th>
           <th style="padding:.75rem 1.25rem;text-align:center">CGPA</th>
@@ -264,9 +265,7 @@
             </div>
           </td>
           <td style="padding:.9rem 1.25rem;text-align:center">
-            <span style="display:inline-block;padding:4px 14px;border-radius:50px;font-size:.95rem;font-weight:800;border:2px solid;
-              {% if tp.cgpa >= 9 %}color:#15803d;border-color:#bbf7d0;background:#f0fdf4
-              {% endif %}">
+            <span style="display:inline-block;padding:4px 14px;border-radius:50px;font-size:.95rem;font-weight:800;border:2px solid #bbf7d0;background:#f0fdf4;color:#15803d">
               {{ tp.cgpa }}
             </span>
           </td>

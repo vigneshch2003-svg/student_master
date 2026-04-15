@@ -16,7 +16,7 @@
     {% endif %}
 </div>
  
-<!-- ─── Search bar ──────────────────────────────────────────────────── -->
+<!--Search bar -->
 {% if is_admin or is_staff %}
 <div style="margin-bottom:1.25rem;">
     <form method="get">
@@ -39,7 +39,7 @@
 </div>
 {% endif %}
  
-<!-- ─── Table card ──────────────────────────────────────────────────── -->
+<!-- Table card  -->
 <div class="mdn-card">
  
     <!-- Card header with count -->
@@ -143,7 +143,7 @@
         </table>
     </div>
  
-    <!-- ─── Pagination ─────────────────────────────────────────────── -->
+    <!-- Pagination  -->
     {% if students.paginator.num_pages > 1 %}
     <div style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 1.25rem;border-top:1px solid var(--border);">
         <small style="color:var(--muted);">
@@ -187,7 +187,7 @@
  
 </div>
  
-<!-- ─── Scoped styles ───────────────────────────────────────────────── -->
+<!-- Scoped styles  -->
 <style>
     .tbl-btn {
         display: inline-flex;

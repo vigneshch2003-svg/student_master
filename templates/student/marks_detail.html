@@ -30,7 +30,7 @@
                     <th class="text-center">Total Marks</th>
                     <th class="text-center">Percentage</th>
                     <th class="text-center">Grade</th>
-                    {% if is_admin or is_staff %}<th class="text-center">Action</th>{% endif %}
+                    {% if is_admin or is_staff %}<th class="text-center">Edit/Delete</th>{% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -49,9 +49,14 @@
                     </td>
                     {% if is_admin or is_staff %}
                     <td class="text-center">
-                        <a href="{% url 'marks_update' mark.id %}" class="tbl-btn tbl-btn-amber">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
+                        <div class="d-flex gap-1 justify-content-center">
+                            <a href="{% url 'marks_update' mark.id %}" class="tbl-btn tbl-btn-amber">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{% url 'marks_delete' mark.id %}" class="tbl-btn tbl-btn-red">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
                     </td>
                     {% endif %}
                 </tr>

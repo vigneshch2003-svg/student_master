@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.auth.models import Group
-from .forms import StaffRegisterForm
 
 
 def student_login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()  #strip is used to remove extra spacees .
+        username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
         user = authenticate(request, username=username, password=password)
         if user is not None and user.groups.filter(name='Student').exists():
@@ -23,27 +21,14 @@ def staff_login_view(request):
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
         user = authenticate(request, username=username, password=password)
-        if user is not None and user.groups.filter(name__in=['Admin', 'Staff']).exists():
+        if user is not None and (
+            user.is_superuser or user.groups.filter(name__in=['Admin', 'Staff']).exists()
+        ):
             login(request, user)
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid credentials or insufficient permissions.')
     return render(request, 'accounts/staff_login.html')
-
-
-def staff_register_view(request):
-    if request.method == 'POST':
-        form = StaffRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            role = form.cleaned_data['role']
-            group, _ = Group.objects.get_or_create(name=role)
-            user.groups.add(group)
-            messages.success(request, f'{role} account created. Please log in.')
-            return redirect('staff_login')
-    else:
-        form = StaffRegisterForm()
-    return render(request, 'accounts/register.html', {'form': form})
 
 
 def logout_view(request):

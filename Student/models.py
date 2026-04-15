@@ -64,3 +64,11 @@ class Marks(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.subject}"
+
+
+class StaffProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='staff_profile')
+    subject = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.username} — {self.subject}"
